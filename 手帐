@@ -1,0 +1,157 @@
+{
+  "name": "blue-memo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Blue Memo - Instagram Style Journal Generator",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
+    "@types/node": "^24.0.10",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.23.12",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
+    "lucide-react": "^0.525.0",
+    "react": "^19.1.0",
+    "react-colorful": "^5.6.1",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "react-rnd": "^10.5.2",
+    "react-router-dom": "^7.6.3",
+    "remark-gfm": "^4.0.1",
+    "zustand": "^5.0.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.31.0",
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.31.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "postcss": "^8.5.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.11",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "^8.37.0",
+    "vite": "^7.0.4"
+  }
+}
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react()],
+
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+
+  server: {
+    host: true,
+    port: 5173,
+    open: true,
+  },
+
+  preview: {
+    port: 4173,
+  },
+
+  build: {
+    target: "esnext",
+    sourcemap: false,
+    minify: "esbuild",
+
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          motion: ["framer-motion"],
+          markdown: ["react-markdown", "remark-gfm"],
+          export: ["html2canvas", "jspdf"],
+        },
+      },
+    },
+  },
+});
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
+tsconfig.app.json
+tsconfig.node.json
+
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+
+    "isolatedModules": true,
+    "moduleDetection": "force",
+
+    "jsx": "react-jsx",
+
+    "strict": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "skipLibCheck": true,
+
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    "baseUrl": ".",
+
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+
+    "types": [
+      "vite/client"
+    ]
+  },
+
+  "include": [
+    "src"
+  ]
+}
