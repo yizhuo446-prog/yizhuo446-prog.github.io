@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>托福写作评分系统 · 6分制</title>
+    <!-- 使用 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ===== 全局重置 & 主题 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f6f9fc;
+            color: #1a2b3c;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(0, 20, 40, 0.08);
+            padding: 2.5rem 2.8rem 3rem;
+            transition: all 0.2s;
+        }
+
+        /* ===== 头部 ===== */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 1.5rem;
+        }
+
+        .app-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .app-header h1 i {
+            color: #3b82f6;
+            font-size: 2rem;
+        }
+
+        .app-header .badge {
+            background: #eef2ff;
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* ===== 配置栏 ===== */
+        .config-bar {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.2rem 2rem;
+            border: 1px solid #e9edf2;
+        }
+
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .config-item label {
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .config-item select,
+        .config-item input[type="text"] {
+            padding: 0.35rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #d0d8e0;
+            background: white;
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.15s;
+        }
+
+        .config-item select:focus,
+        .config-item input[type="text"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .config-item input[type="text"] {
+            width: 220px;
+        }
+
+        .config-item .api-key-hint {
+            color: #6b7a8a;
+            font-size: 0.75rem;
+            cursor: help;
+        }
+
+        /* ===== 输入区 ===== */
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        .input-section .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .input-section .label-row label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1a2b3c;
+        }
+
+        .input-section .label-row .word-count {
+            font-size: 0.85rem;
+            color: #6b7a8a;
+            background: #f0f4f8;
+            padding: 0.2rem 0.9rem;
+            border-radius: 20px;
+        }
+
+        textarea#essayInput {
+            width: 100%;
+            height: 280px;
+            padding: 1.2rem 1.5rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            resize: vertical;
+            transition: 0.2s;
+            font-family: 'Inter', monospace;
+            background: #fafcfe;
+            color: #1a2b3c;
+        }
+
+        textarea#essayInput:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
+            outline: none;
+            background: #ffffff;
+        }
+
+        textarea#essayInput::placeholder {
+            color: #a0b3c5;
+            font-style: italic;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 1.2rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-row .left-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.65rem 1.8rem;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0f4f8;
+            color: #1a2b3c;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #d0d8e0;
+        }
+        .btn-outline:hover {
+            background: #f0f4f8;
+            border-color: #a0b3c5;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* ===== 进度条 ===== */
+        .progress-wrapper {
+            margin: 1.8rem 0 0.5rem;
+            display: none;
+        }
+        .progress-wrapper.active {
+            display: block;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9edf2;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+        .progress-text {
+            font-size: 0.8rem;
+            color: #6b7a8a;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        /* ===== 结果面板 ===== */
+        #resultsPanel {
+            margin-top: 2.5rem;
+            display: none;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .score-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .score-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            border: 1px solid #e9edf2;
+            transition: 0.15s;
+        }
+        .score-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .score-card .label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #6b7a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-card .value {
+            font-size: 2.4rem;
+            font-weight: 700;
+            margin: 6px 0 2px;
+            color: #1a2b3c;
+        }
+
+        .score-card .sub {
+            font-size: 0.75rem;
+            color: #8a9aa8;
+        }
+
+        .score-card.total {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-color: transparent;
+            color: white;
+        }
+        .score-card.total .label {
+            color: rgba(255, 255, 255, 0.75);
+        }
+        .score-card.total .value {
+            color: white;
+        }
+        .score-card.total .sub {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .score-card .stars {
+            color: #f59e0b;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* ===== 详细反馈 ===== */
+        .detail-section {
+            margin-top: 1.8rem;
+        }
+
+        .detail-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1a2b3c;
+        }
+
+        .detail-section h3 i {
+            color: #3b82f6;
+        }
+
+        .error-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 320px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .error-item {
+            background: #fefaf5;
+            border-left: 4px solid #f59e0b;
+            padding: 0.7rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border: 1px solid #f0e6d8;
+        }
+
+        .error-item .icon {
+            color: #f59e0b;
+            font-size: 1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .error-item .msg {
+            flex: 1;
+            color: #2c3e50;
+        }
+
+        .error-item .msg strong {
+            background: #fef3c7;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .error-item .suggestion {
+            color: #3b82f6;
+            font-weight: 500;
+            margin-left: 6px;
+        }
+
+        .error-item .type-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #e9edf2;
+            padding: 0.15rem 0.7rem;
+            border-radius: 20px;
+            color: #4b5a6a;
+            flex-shrink: 0;
+        }
+
+        .error-item .type-badge.spelling {
+            background: #fce4ec;
+            color: #c62828;
+        }
+        .error-item .type-badge.grammar {
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+        .error-item .type-badge.coherence {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+        .error-item .type-badge.content {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .no-errors {
+            color: #10b981;
+            font-weight: 500;
+            padding: 0.8rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== AI 评分区域 ===== */
+        .ai-section {
+            margin-top: 2rem;
+            padding: 1.5rem 1.8rem;
+            background: #f0f7ff;
+            border-radius: 16px;
+            border: 1px dashed #93b4e8;
+        }
+
+        .ai-section .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ai-section .ai-header h4 {
+            font-weight: 600;
+            color: #1a3a6b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-section .ai-header h4 i {
+            color: #8b5cf6;
+        }
+
+        .ai-score-box {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.8rem;
+        }
+
+        .ai-score-box .ai-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1a3a6b;
+        }
+
+        .ai-score-box .ai-label {
+            color: #3a5a7b;
+            font-size: 0.9rem;
+        }
+
+        .ai-score-box .ai-detail {
+            color: #4a6a8b;
+            font-size: 0.9rem;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .ai-score-box .ai-detail span {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.85rem;
+            color: #5a7a9b;
+        }
+
+        .btn-ai {
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-ai:hover {
+            background: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.3);
+        }
+        .btn-ai:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 700px) {
+            .app-container {
+                padding: 1.5rem 1.2rem;
+            }
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .app-header h1 {
+                font-size: 1.5rem;
+            }
+            .config-bar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .config-item {
+                flex-wrap: wrap;
+            }
+            .config-item input[type="text"] {
+                width: 100%;
+            }
+            .action-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-row .left-btns {
+                justify-content: center;
+            }
+            .btn {
+                justify-content: center;
+                padding: 0.6rem 1.2rem;
+            }
+            .score-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .ai-section {
+                padding: 1rem;
+            }
+            .ai-score-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .score-overview {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem;
+            }
+            .score-card .value {
+                font-size: 1.8rem;
+            }
+            textarea#essayInput {
+                height: 200px;
+            }
+        }
+
+        /* ===== 滚动条 ===== */
+        .error-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .error-list::-webkit-scrollbar-track {
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+        .error-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+
+        /* ===== 工具类 ===== */
+        .hidden {
+            display: none !important;
+        }
+        .text-muted {
+            color: #6b7a8a;
+            font-size: 0.85rem;
+        }
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="app">
+        <!-- 头部 -->
+        <header class="app-header">
+            <h1>
+                <i class="fas fa-pen-fancy"></i>
+                托福写作评分
+                <span class="badge">6 分制</span>
+            </h1>
+            <div class="header-actions">
+                <span class="text-muted" style="font-size:0.85rem;">
+                    <i class="fas fa-code-branch"></i> 开源可扩展
+                </span>
+            </div>
+        </header>
+
+        <!-- 配置栏 -->
+        <div class="config-bar">
+            <div class="config-item">
+                <label><i class="fas fa-globe"></i> 语言</label>
+                <select id="langSelect">
+                    <option value="en-US">英文 (美式)</option>
+                    <option value="en-GB">英文 (英式)</option>
+                </select>
+            </div>
+            <div class="config-item">
+                <label><i class="fas fa-robot"></i> AI 评分</label>
+                <select id="aiProvider">
+                    <option value="none">无 (仅本地)</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="claude">Claude</option>
+                </select>
+            </div>
+            <div class="config-item" id="apiKeyGroup">
+                <label><i class="fas fa-key"></i> API Key</label>
+                <input type="text" id="apiKeyInput" placeholder="sk-..." />
+                <span class="api-key-hint" title="AI 评分需要 API Key，不会保存">ⓘ</span>
+            </div>
+        </div>
+
+        <!-- 输入区 -->
+        <section class="input-section">
+            <div class="label-row">
+                <label for="essayInput"><i class="fas fa-file-alt"></i> 粘贴你的托福作文</label>
+                <span class="word-count" id="wordCount">0 词</span>
+            </div>
+            <textarea id="essayInput" placeholder="在此粘贴或输入你的托福作文（建议 150–400 词）&#10;例如：The advancement of technology has profoundly transformed the way we communicate..." spellcheck="false"></textarea>
+
+            <div class="action-row">
+                <div class="left-btns">
+                    <button class="btn btn-primary" id="btnEvaluate">
+                        <i class="fas fa-chart-simple"></i> 开始评分
+                    </button>
+                    <button class="btn btn-outline" id="btnClear">
+                        <i class="fas fa-eraser"></i> 清空
+                    </button>
+                    <button class="btn btn-outline" id="btnExample">
+                        <i class="fas fa-file-pen"></i> 示例作文
+                    </button>
+                </div>
+                <span style="font-size:0.8rem; color:#8a9aa8;">
+                    <i class="fas fa-info-circle"></i> 支持外接 LanguageTool + AI
+                </span>
+            </div>
+
+            <!-- 进度 -->
+            <div class="progress-wrapper" id="progressWrapper">
+                <div class="progress-bar">
+                    <div class="fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">准备中...</div>
+            </div>
+        </section>
+
+        <!-- 结果面板 -->
+        <div id="resultsPanel">
+            <!-- 总分卡片 -->
+            <div class="score-overview" id="scoreOverview">
+                <!-- 由 JS 动态渲染 -->
+            </div>
+
+            <!-- 详细错误 -->
+            <div class="detail-section">
+                <h3><i class="fas fa-list-check"></i> 详细反馈与建议</h3>
+                <div id="errorListContainer">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 连贯性 & 内容 详情 -->
+            <div class="detail-section" style="margin-top:1.2rem;">
+                <h3><i class="fas fa-chart-line"></i> 连贯性 &amp; 内容分析</h3>
+                <div id="coherenceContentDetail" style="background:#f8fafc; border-radius:12px; padding:1rem 1.4rem; border:1px solid #e9edf2;">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+
+            <!-- AI 评分外接区域 -->
+            <div class="ai-section" id="aiSection">
+                <div class="ai-header">
+                    <h4><i class="fas fa-brain"></i> AI 智能评分 (外接)</h4>
+                    <button class="btn-ai" id="btnAiScore">
+                        <i class="fas fa-microchip"></i> 调用 AI 评分
+                    </button>
+                </div>
+                <div class="ai-score-box" id="aiScoreBox">
+                    <div class="ai-value" id="aiScoreValue">—</div>
+                    <div class="ai-label">AI 评分 (0–6)</div>
+                    <div class="ai-detail" id="aiScoreDetail">
+                        点击上方按钮，使用 AI 模型评估作文
+                        <span>支持 OpenAI / Claude</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div style="margin-top:2.5rem; border-top:1px solid #eef2f6; padding-top:1.2rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:0.8rem; color:#8a9aa8;">
+            <span><i class="fas fa-code"></i> 基于 LanguageTool 开源 + 本地算法</span>
+            <span>
+                <i class="fas fa-github"></i> 可外接任意 AI 评分系统
+                <span style="margin-left:12px; background:#eef2f6; padding:0.1rem 0.8rem; border-radius:20px;">v2.0</span>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  TOEFL 写作评分系统 · 完整逻辑
+        //  功能：拼写 / 语法 / 连贯性 / 内容 · 满分 6 分
+        //  外接：LanguageTool API (开源) + AI (OpenAI/Claude)
+        // ================================================================
+
+        (function() {
+            'use strict';
+
+            // ---------- DOM 引用 ----------
+            const essayInput = document.getElementById('essayInput');
+            const wordCount = document.getElementById('wordCount');
+            const btnEvaluate = document.getElementById('btnEvaluate');
+            const btnClear = document.getElementById('btnClear');
+            const btnExample = document.getElementById('btnExample');
+            const btnAiScore = document.getElementById('btnAiScore');
+            const resultsPanel = document.getElementById('resultsPanel');
+            const scoreOverview = document.getElementById('scoreOverview');
+            const errorListContainer = document.getElementById('errorListContainer');
+            const coherenceContentDetail = document.getElementById('coherenceContentDetail');
+            const progressWrapper = document.getElementById('progressWrapper');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            const langSelect = document.getElementById('langSelect');
+            const aiProvider = document.getElementById('aiProvider');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const aiScoreValue = document.getElementById('aiScoreValue');
+            const aiScoreDetail = document.getElementById('aiScoreDetail');
+
+            // ---------- 状态 ----------
+            let isEvaluating = false;
+            let lastResult = null; // 缓存最近一次评分结果
+
+            // ---------- 辅助函数 ----------
+            function getWordCount(text) {
+                const clean = text.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+                return clean === '' ? 0 : clean.split(/\s+/).length;
+            }
+
+            function updateWordCount() {
+                const count = getWordCount(essayInput.value);
+                wordCount.textContent = count + ' 词';
+                return count;
+            }
+
+            // 更新进度
+            function setProgress(percent, text) {
+                progressWrapper.classList.add('active');
+                progressFill.style.width = Math.min(100, Math.max(0, percent)) + '%';
+                progressText.textContent = text || (percent + '%');
+                if (percent >= 100) {
+                    setTimeout(() => {
+                        progressWrapper.classList.remove('active');
+                    }, 800);
+                }
+            }
+
+            // ---------- 示例作文 ----------
+            function loadExample() {
+                const example = `The advancement of technology has profoundly transformed the way we communicate with one another. While some argue that this progress has diminished the quality of human interaction, I firmly believe that technology has enhanced our ability to connect across distances and cultures.
+
+            Firstly, modern communication tools such as social media, video conferencing, and instant messaging have made it possible to maintain relationships regardless of geographical barriers. For instance, a student studying abroad can easily talk to their family every day through video calls, which was unimaginable just a few decades ago. This constant connection fosters emotional bonds and provides a sense of support.
+
+            Moreover, technology has democratized access to information and education. Online platforms like Coursera and Khan Academy offer courses from top universities to anyone with an internet connection. This has empowered millions of people to acquire new skills and improve their livelihoods. In this sense, technology is not merely a convenience but a catalyst for social mobility.
+
+            However, it is important to acknowledge the challenges. The overuse of digital devices can lead to screen addiction and reduce face-to-face interactions. Additionally, the spread of misinformation on social media platforms poses a serious threat to public discourse. Nevertheless, these problems are not inherent to technology itself but rather stem from how we choose to use it.
+
+            In conclusion, while technology presents certain drawbacks, its positive impact on human connection, education, and empowerment far outweighs the negatives. It is our responsibility to harness technology wisely and ensure it serves the greater good.`;
+                essayInput.value = example;
+                updateWordCount();
+                // 清空旧结果
+                resultsPanel.style.display = 'none';
+                lastResult = null;
+            }
+
+            // ---------- 清空 ----------
+            function clearAll() {
+                essayInput.value = '';
+                updateWordCount();
+                resultsPanel.style.display = 'none';
+                lastResult = null;
+                aiScoreValue.textContent = '—';
+                aiScoreDetail.innerHTML =
+                '点击上方按钮，使用 AI 模型评估作文<span>支持 OpenAI / Claude</span>';
+            }
+
+            // ---------- 核心评分函数 (本地) ----------
+            async function evaluateEssay(text, lang) {
+                if (!text || text.trim().length < 10) {
+                    throw new Error('作文内容太短，请至少输入 10 个字符。');
+                }
+
+                const wordCountVal = getWordCount(text);
+                if (wordCountVal < 30) {
+                    throw new Error('作文词数过少（建议 ≥ 50 词），请补充内容。');
+                }
+
+                setProgress(5, '开始分析...');
+
+                // 1. 调用 LanguageTool API (拼写 + 语法)
+                let ltMatches = [];
+                let ltError = null;
+                try {
+                    setProgress(15, '调用 LanguageTool 检查拼写与语法...');
+                    const response = await callLanguageTool(text, lang);
+                    ltMatches = response.matches || [];
+                    setProgress(50, 'LanguageTool 检查完成');
+                } catch (err) {
+                    ltError = err.message || 'LanguageTool 服务不可用，使用本地备用检查。';
+                    console.warn('LanguageTool 调用失败:', err);
+                    setProgress(50, '使用本地备用检查...');
+                }
+
+                // 2. 本地拼写备用检查 (简单字典)
+                const localSpellingErrors = ltError ? checkSpellingLocal(text) : [];
+
+                // 3. 本地连贯性分析
+                const coherenceResult = analyzeCoherence(text);
+
+                // 4. 本地内容分析
+                const contentResult = analyzeContent(text);
+
+                // 5. 汇总错误
+                const allErrors = buildErrorList(ltMatches, localSpellingErrors, coherenceResult, contentResult, text);
+
+                // 6. 计算各维度分数
+                const scores = computeScores(allErrors, ltMatches, coherenceResult, contentResult, text, wordCountVal);
+
+                setProgress(90, '生成评分报告...');
+
+                const result = {
+                    scores: scores,
+                    errors: allErrors,
+                    coherence: coherenceResult,
+                    content: contentResult,
+                    wordCount: wordCountVal,
+                    ltMatches: ltMatches,
+                    ltError: ltError,
+                    text: text,
+                };
+
+                setProgress(100, '评分完成！');
+                return result;
+            }
+
+            // ---------- 调用 LanguageTool API ----------
+            async function callLanguageTool(text, lang) {
+                const url = 'https://api.languagetool.org/v2/check';
+                const params = new URLSearchParams();
+                params.append('text', text);
+                params.append('language', lang || 'en-US');
+                params.append('enabledOnly', 'false');
+                params.append('level', 'picky');
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: params.toString(),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return await response.json();
+            }
+
+            // ---------- 本地拼写备用检查 (简易) ----------
+            // 使用常见英文单词列表 (仅作备用)
+            function checkSpellingLocal(text) {
+                const commonWords = new Set([
+                    'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+                    'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at',
+                    'this', 'but', 'his', 'by', 'from', 'they', 'we', 'say', 'her', 'she',
+                    'or', 'an', 'will', 'my', 'one', 'all', 'would', 'there', 'their', 'what',
+                    'so', 'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me',
+                    'when', 'make', 'can', 'like', 'time', 'no', 'just', 'him', 'know', 'take',
+                    'people', 'into', 'year', 'your', 'good', 'some', 'could', 'them', 'see', 'other',
+                    'than', 'then', 'now', 'look', 'only', 'come', 'its', 'over', 'think', 'also',
+                    'back', 'after', 'use', 'two', 'how', 'our', 'work', 'first', 'well', 'way',
+                    'even', 'new', 'want', 'because', 'any', 'these', 'give', 'day', 'most', 'us',
+                    'technology', 'communication', 'education', 'development', 'social', 'media', 'internet',
+                    'information', 'knowledge', 'opportunity', 'challenge', 'benefit', 'advantage', 'disadvantage',
+                    'global', 'cultural', 'economic', 'political', 'environmental', 'sustainable', 'innovation',
+                    'future', 'health', 'wellness', 'community', 'connection', 'relationship', 'interaction',
+                    'democracy', 'freedom', 'equality', 'diversity', 'inclusion', 'justice', 'peace',
+                    'science', 'research', 'discovery', 'progress', 'tradition', 'heritage', 'identity',
+                    'student', 'teacher', 'university', 'course', 'degree', 'career', 'profession',
+                    'opportunity', 'challenge', 'decision', 'solution', 'problem', 'issue', 'concern',
+                    'example', 'instance', 'context', 'perspective', 'viewpoint', 'argument', 'evidence',
+                ]);
+
+                const words = text.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter(w => w.length > 0);
+                const errors = [];
+                const seen = new Set();
+                for (const w of words) {
+                    if (w.length > 0 && !commonWords.has(w) && !seen.has(w)) {
+                        // 检查是否包含数字或特殊字符
+                        if (!/^[a-z']+$/.test(w)) continue;
+                        // 忽略常见学术词 (这里简单处理)
+                        if (w.length > 12) continue; // 长词可能是专业术语
+                        seen.add(w);
+                        // 只在文本中标记一次
+                        const idx = text.toLowerCase().indexOf(w);
+                        if (idx !== -1) {
+                            errors.push({
+                                type: 'spelling',
+                                message: `"${w}" 可能是拼写错误，请检查。`,
+                                offset: idx,
+                                length: w.length,
+                                replacements: [],
+                                context: text.substring(Math.max(0, idx - 10), Math.min(text.length, idx + w.length + 10)),
+                            });
+                        }
+                    }
+                }
+                return errors.slice(0, 15); // 限制数量
+            }
+
+            // ---------- 连贯性分析 ----------
+            function analyzeCoherence(text) {
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 5);
+                const sentenceCount = sentences.length;
+                if (sentenceCount < 2) {
+                    return {
+                        score: 2.0,
+                        details: ['句子数量太少，建议增加论证段落。'],
+                        transitionCount: 0,
+                        sentenceLenAvg: 0,
+                        sentenceLenStd: 0,
+                        paragraphCount: 1,
+                    };
+                }
+
+                // 连接词列表
+                const transitions = [
+                    'however', 'therefore', 'moreover', 'furthermore', 'in addition', 'additionally',
+                    'consequently', 'hence', 'thus', 'accordingly', 'as a result', 'for example',
+                    'for instance', 'specifically', 'in particular', 'on the other hand', 'alternatively',
+                    'nevertheless', 'nonetheless', 'whereas', 'while', 'although', 'though', 'even though',
+                    'despite', 'in spite of', 'since', 'because', 'as', 'due to', 'owing to',
+                    'first', 'second', 'third', 'finally', 'lastly', 'in conclusion', 'to conclude',
+                    'overall', 'ultimately', 'in summary', 'to summarize',
+                ];
+
+                const lowerText = text.toLowerCase();
+                let transitionCount = 0;
+                for (const t of transitions) {
+                    const regex = new RegExp('\\b' + t.replace(/\s/g, '\\s+') + '\\b', 'gi');
+                    const matches = lowerText.match(regex);
+                    if (matches) transitionCount += matches.length;
+                }
+
+                // 句子长度
+                const lengths = sentences.map(s => s.trim().split(/\s+/).length);
+                const avgLen = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+                const variance = lengths.reduce((a, b) => a + (b - avgLen) ** 2, 0) / lengths.length;
+                const stdDev = Math.sqrt(variance);
+
+                // 段落数 (基于换行)
+                const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 10);
+                const paragraphCount = paragraphs.length || 1;
+
+                // 评分：连接词密度、句子长度变化、段落数
+                let score = 3.0;
+                const details = [];
+
+                // 连接词密度 (每10句至少1个)
+                const transDensity = transitionCount / Math.max(1, sentenceCount);
+                if (transDensity > 0.3) {
+                    score += 1.2;
+                    details.push('连接词使用丰富，逻辑流畅。');
+                } else if (transDensity > 0.15) {
+                    score += 0.6;
+                    details.push('连接词使用适当，可进一步丰富。');
+                } else {
+                    score -= 0.5;
+                    details.push('连接词较少，建议增加过渡词增强连贯性。');
+                }
+
+                // 句子长度标准差 (理想: 8-15)
+                if (stdDev > 5 && stdDev < 15) {
+                    score += 0.8;
+                    details.push('句子长度变化适中，节奏良好。');
+                } else if (stdDev >= 15) {
+                    score += 0.4;
+                    details.push('句子长度变化较大，部分句子可能过长或过短。');
+                } else {
+                    score -= 0.3;
+                    details.push('句子长度变化较小，建议丰富句式。');
+                }
+
+                // 段落数
+                if (paragraphCount >= 3) {
+                    score += 0.6;
+                    details.push('段落结构清晰，符合学术写作规范。');
+                } else if (paragraphCount === 2) {
+                    score += 0.2;
+                    details.push('建议增加段落，使结构更完整。');
+                } else {
+                    score -= 0.4;
+                    details.push('段落较少，建议分段论述。');
+                }
+
+                // 句子数量
+                if (sentenceCount < 6) {
+                    score -= 0.5;
+                    details.push('句子数量偏少，内容可能不够充实。');
+                }
+
+                // 限制范围 1-6
+                score = Math.min(6, Math.max(1, score));
+
+                return {
+                    score: Math.round(score * 10) / 10,
+                    details: details,
+                    transitionCount: transitionCount,
+                    sentenceLenAvg: Math.round(avgLen * 10) / 10,
+                    sentenceLenStd: Math.round(stdDev * 10) / 10,
+                    paragraphCount: paragraphCount,
+                    sentenceCount: sentenceCount,
+                };
+            }
+
+            // ---------- 内容分析 ----------
+            function analyzeContent(text) {
+                const words = text.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter(w => w.length > 0);
+                const wordCount = words.length;
+                if (wordCount < 10) {
+                    return {
+                        score: 2.0,
+                        details: ['内容过于简短，无法有效评估。'],
+                        ttr: 0,
+                        avgWordLen: 0,
+                        complexRatio: 0,
+                    };
+                }
+
+                // 词汇多样性 (Type-Token Ratio)
+                const unique = new Set(words);
+                const ttr = unique.size / wordCount;
+
+                // 平均词长
+                const totalLen = words.reduce((a, b) => a + b.length, 0);
+                const avgWordLen = totalLen / wordCount;
+
+                // 复杂词比例 (长度 >= 7)
+                const complexCount = words.filter(w => w.length >= 7).length;
+                const complexRatio = complexCount / wordCount;
+
+                // 评分
+                let score = 3.0;
+                const details = [];
+
+                // TTR: 理想 > 0.5
+                if (ttr > 0.6) {
+                    score += 1.2;
+                    details.push('词汇非常丰富，多样性优秀。');
+                } else if (ttr > 0.5) {
+                    score += 0.7;
+                    details.push('词汇多样性良好。');
+                } else if (ttr > 0.4) {
+                    score += 0.2;
+                    details.push('词汇多样性一般，建议使用更多同义词。');
+                } else {
+                    score -= 0.6;
+                    details.push('词汇重复较多，建议丰富表达。');
+                }
+
+                // 平均词长: 理想 4.5-6.5
+                if (avgWordLen > 5.5 && avgWordLen < 7) {
+                    score += 0.7;
+                    details.push('词汇难度适中，学术性较好。');
+                } else if (avgWordLen >= 7) {
+                    score += 0.3;
+                    details.push('词汇难度较高，注意可读性。');
+                } else if (avgWordLen < 4.5) {
+                    score -= 0.4;
+                    details.push('词汇偏简单，建议使用更学术的词汇。');
+                }
+
+                // 复杂词比例: 理想 > 0.15
+                if (complexRatio > 0.25) {
+                    score += 0.6;
+                    details.push('使用较多高级词汇，表达能力强。');
+                } else if (complexRatio > 0.15) {
+                    score += 0.3;
+                    details.push('高级词汇使用适当。');
+                } else {
+                    details.push('高级词汇较少，可尝试使用更精准的学术词汇。');
+                }
+
+                // 词数
+                if (wordCount < 100) {
+                    score -= 0.3;
+                    details.push('文章词数偏少，建议扩充内容。');
+                } else if (wordCount > 350) {
+                    details.push('文章篇幅较长，注意精炼表达。');
+                }
+
+                score = Math.min(6, Math.max(1, score));
+                return {
+                    score: Math.round(score * 10) / 10,
+                    details: details,
+                    ttr: Math.round(ttr * 100) / 100,
+                    avgWordLen: Math.round(avgWordLen * 10) / 10,
+                    complexRatio: Math.round(complexRatio * 100) / 100,
+                    wordCount: wordCount,
+                };
+            }
+
+            // ---------- 构建错误列表 ----------
+            function buildErrorList(ltMatches, localErrors, coherence, content, text) {
+                const errors = [];
+
+                // LanguageTool 错误
+                for (const m of ltMatches) {
+                    let type = 'grammar';
+                    if (m.rule && m.rule.category && m.rule.category.id) {
+                        const cat = m.rule.category.id;
+                        if (cat === 'TYPOS' || cat === 'MISSPELLING') {
+                            type = 'spelling';
+                        } else if (cat === 'GRAMMAR') {
+                            type = 'grammar';
+                        } else {
+                            type = 'grammar';
+                        }
+                    }
+                    const msg = m.message || '语法/拼写问题';
+                    const replacements = m.replacements ? m.replacements.map(r => r.value) : [];
+                    const context = m.context ? m.context.text : '';
+                    errors.push({
+                        type: type,
+                        message: msg,
+                        offset: m.offset || 0,
+                        length: m.length || 1,
+                        replacements: replacements,
+                        context: context,
+                        rule: m.rule ? m.rule.id : '',
+                    });
+                }
+
+                // 本地拼写错误 (去重)
+                for (const e of localErrors) {
+                    // 检查是否已存在类似错误
+                    const dup = errors.some(ex =>
+                        ex.type === 'spelling' &&
+                        ex.message === e.message
+                    );
+                    if (!dup) {
+                        errors.push(e);
+                    }
+                }
+
+                // 连贯性建议 (作为错误展示)
+                if (coherence.details) {
+                    for (const d of coherence.details) {
+                        if (d.includes('较少') || d.includes('偏少') || d.includes('建议')) {
+                            errors.push({
+                                type: 'coherence',
+                                message: '📌 ' + d,
+                                offset: 0,
+                                length: 0,
+                                replacements: [],
+                                context: '',
+                            });
+                        }
+                    }
+                }
+
+                // 内容建议
+                if (content.details) {
+                    for (const d of content.details) {
+                        if (d.includes('重复') || d.includes('偏简单') || d.includes('较少') || d.includes('建议')) {
+                            errors.push({
+                                type: 'content',
+                                message: '📌 ' + d,
+                                offset: 0,
+                                length: 0,
+                                replacements: [],
+                                context: '',
+                            });
+                        }
+                    }
+                }
+
+                // 限制数量，避免太多
+                return errors.slice(0, 30);
+            }
+
+            // ---------- 计算各维度分数 ----------
+            function computeScores(errors, ltMatches, coherence, content, text, wordCount) {
+                // 1. 拼写分数 (基于 LT 拼写错误 + 本地)
+                const spellingErrors = errors.filter(e => e.type === 'spelling');
+                const spellingCount = spellingErrors.length;
+                let spellingScore = 6.0;
+                if (wordCount > 0) {
+                    const rate = spellingCount / wordCount * 100; // 每100词错误数
+                    if (rate < 0.5) spellingScore = 6.0;
+                    else if (rate < 1.5) spellingScore = 5.5;
+                    else if (rate < 2.5) spellingScore = 4.5;
+                    else if (rate < 4.0) spellingScore = 3.5;
+                    else if (rate < 6.0) spellingScore = 2.5;
+                    else spellingScore = 1.5;
+                }
+                spellingScore = Math.min(6, Math.max(1, spellingScore));
+
+                // 2. 语法分数 (基于 LT 语法错误)
+                const grammarErrors = errors.filter(e => e.type === 'grammar');
+                const grammarCount = grammarErrors.length + Math.floor(ltMatches.length * 0.3); // 综合
+                let grammarScore = 6.0;
+                if (wordCount > 0) {
+                    const rate = grammarCount / wordCount * 100;
+                    if (rate < 0.8) grammarScore = 6.0;
+                    else if (rate < 2.0) grammarScore = 5.0;
+                    else if (rate < 3.5) grammarScore = 4.0;
+                    else if (rate < 5.5) grammarScore = 3.0;
+                    else if (rate < 8.0) grammarScore = 2.0;
+                    else grammarScore = 1.0;
+                }
+                grammarScore = Math.min(6, Math.max(1, grammarScore));
+
+                // 3. 连贯性分数 (来自 coherence)
+                let coherenceScore = coherence.score || 3.0;
+
+                // 4. 内容分数 (来自 content)
+                let contentScore = content.score || 3.0;
+
+                // 总分 (加权)
+                const totalScore =
+                    spellingScore * 0.20 +
+                    grammarScore * 0.25 +
+                    coherenceScore * 0.25 +
+                    contentScore * 0.30;
+
+                const finalTotal = Math.min(6, Math.max(1, Math.round(totalScore * 10) / 10));
+
+                return {
+                    spelling: Math.round(spellingScore * 10) / 10,
+                    grammar: Math.round(grammarScore * 10) / 10,
+                    coherence: Math.round(coherenceScore * 10) / 10,
+                    content: Math.round(contentScore * 10) / 10,
+                    total: finalTotal,
+                    spellingCount: spellingCount,
+                    grammarCount: grammarCount,
+                };
+            }
+
+            // ---------- 渲染结果 ----------
+            function renderResults(result) {
+                const s = result.scores;
+
+                // 1. 总分卡片
+                const stars = '★'.repeat(Math.round(s.total)) + '☆'.repeat(6 - Math.round(s.total));
+                scoreOverview.innerHTML = `
+                    <div class="score-card total">
+                        <div class="label">总分</div>
+                        <div class="value">${s.total}</div>
+                        <div class="stars">${stars}</div>
+                        <div class="sub">满分 6.0</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="label"><i class="fas fa-spell-check"></i> 拼写</div>
+                        <div class="value">${s.spelling}</div>
+                        <div class="sub">${s.spellingCount} 处错误</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="label"><i class="fas fa-code"></i> 语法</div>
+                        <div class="value">${s.grammar}</div>
+                        <div class="sub">${s.grammarCount} 处错误</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="label"><i class="fas fa-link"></i> 连贯性</div>
+                        <div class="value">${s.coherence}</div>
+                        <div class="sub">${result.coherence.transitionCount || 0} 个连接词</div>
+                    </div>
+                    <div class="score-card">
+                        <div class="label"><i class="fas fa-book"></i> 内容</div>
+                        <div class="value">${s.content}</div>
+                        <div class="sub">${result.content.wordCount || result.wordCount} 词</div>
+                    </div>
+                `;
+
+                // 2. 错误列表
+                if (result.errors.length === 0) {
+                    errorListContainer.innerHTML = `
+                        <div class="no-errors">
+                            <i class="fas fa-check-circle"></i> 太棒了！没有发现明显错误。
+                        </div>
+                    `;
+                } else {
+                    let html = '<div class="error-list">';
+                    for (const err of result.errors) {
+                        const typeLabel = err.type === 'spelling' ? '拼写' :
+                            err.type === 'grammar' ? '语法' :
+                            err.type === 'coherence' ? '连贯' : '内容';
+                        const typeClass = err.type === 'spelling' ? 'spelling' :
+                            err.type === 'grammar' ? 'grammar' :
+                            err.type === 'coherence' ? 'coherence' : 'content';
+                        const icon = err.type === 'spelling' ? 'fa-pen' :
+                            err.type === 'grammar' ? 'fa-code' :
+                            err.type === 'coherence' ? 'fa-link' : 'fa-book';
+                        const suggestion = err.replacements && err.replacements.length > 0 ?
+                            ` → 建议: ${err.replacements.slice(0, 3).join(', ')}` :
+                            '';
+                        const contextText = err.context ? `…${err.context}…` : '';
+                        html += `
+                            <div class="error-item">
+                                <div class="icon"><i class="fas ${icon}"></i></div>
+                                <div class="msg">
+                                    <strong>${err.message}</strong>
+                                    ${suggestion ? `<span class="suggestion">${suggestion}</span>` : ''}
+                                    ${contextText ? `<br><span style="font-size:0.8rem;color:#6b7a8a;">${contextText}</span>` : ''}
+                                </div>
+                                <span class="type-badge ${typeClass}">${typeLabel}</span>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                    errorListContainer.innerHTML = html;
+                }
+
+                // 3. 连贯性 & 内容详情
+                const c = result.coherence;
+                const ct = result.content;
+                coherenceContentDetail.innerHTML = `
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:1rem;">
+                        <div>
+                            <div style="font-weight:600; color:#2c3e50;">📊 连贯性</div>
+                            <div style="font-size:0.9rem; color:#4b5a6a; margin-top:4px;">
+                                <div>句子数: ${c.sentenceCount || 0}</div>
+                                <div>连接词: ${c.transitionCount || 0}</div>
+                                <div>平均句长: ${c.sentenceLenAvg || 0} 词</div>
+                                <div>句长标准差: ${c.sentenceLenStd || 0}</div>
+                                <div>段落数: ${c.paragraphCount || 1}</div>
+                            </div>
+                            ${c.details ? c.details.map(d => `<div style="font-size:0.85rem; color:#3b82f6; margin-top:2px;">✓ ${d}</div>`).join('') : ''}
+                        </div>
+                        <div>
+                            <div style="font-weight:600; color:#2c3e50;">📖 内容质量</div>
+                            <div style="font-size:0.9rem; color:#4b5a6a; margin-top:4px;">
+                                <div>词汇多样性 (TTR): ${ct.ttr || 0}</div>
+                                <div>平均词长: ${ct.avgWordLen || 0}</div>
+                                <div>高级词汇比: ${ct.complexRatio ? (ct.complexRatio * 100).toFixed(1) + '%' : '0%'}</div>
+                                <div>总词数: ${ct.wordCount || result.wordCount}</div>
+                            </div>
+                            ${ct.details ? ct.details.map(d => `<div style="font-size:0.85rem; color:#10b981; margin-top:2px;">✓ ${d}</div>`).join('') : ''}
+                        </div>
+                    </div>
+                `;
+
+                resultsPanel.style.display = 'block';
+                // 滚动到结果
+                resultsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // ---------- AI 评分 (外接) ----------
+            async function callAiScore(text, provider, apiKey) {
+                if (!apiKey || apiKey.trim().length < 10) {
+                    throw new Error('请先输入有效的 API Key');
+                }
+
+                const prompt =
+                    `You are an expert TOEFL writing evaluator. Grade the following essay on a scale of 0-6 (with 0.5 increments). Provide a brief justification and highlight strengths and weaknesses. Keep the response under 150 words.
+
+            Essay:
+            ${text}
+
+            Output format: score: X.X | justification: ...`;
+
+                let response;
+                if (provider === 'openai') {
+                    response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`,
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-3.5-turbo',
+                            messages: [{ role: 'user', content: prompt }],
+                            temperature: 0.5,
+                            max_tokens: 200,
+                        }),
+                    });
+                } else if (provider === 'claude') {
+                    // Claude API (Anthropic)
+                    response = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': apiKey,
+                            'anthropic-version': '2023-06-01',
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-3-haiku-20240307',
+                            messages: [{ role: 'user', content: prompt }],
+                            max_tokens: 200,
+                            temperature: 0.5,
+                        }),
+                    });
+                } else {
+                    throw new Error('不支持的 AI 提供商');
+                }
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`API 错误 (${response.status}): ${errText}`);
+                }
+
+                const data = await response.json();
+                let contentText = '';
+                if (provider === 'openai') {
+                    contentText = data.choices?.[0]?.message?.content || '';
+                } else if (provider === 'claude') {
+                    contentText = data.content?.[0]?.text || '';
+                }
+
+                // 解析分数
+                const scoreMatch = contentText.match(/score:\s*(\d+\.?\d*)/i);
+                let score = null;
+                if (scoreMatch) {
+                    score = parseFloat(scoreMatch[1]);
+                    if (isNaN(score) || score < 0 || score > 6) score = null;
+                }
+                if (score === null) {
+                    // 尝试更宽松的匹配
+                    const match2 = contentText.match(/(\d+\.?\d*)\s*\/\s*6/i);
+                    if (match2) {
+                        score = parseFloat(match2[1]);
+                        if (isNaN(score) || score < 0 || score > 6) score = null;
+                    }
+                }
+                if (score === null) {
+                    // 尝试找任何数字
+                    const match3 = contentText.match(/\b(\d+\.?\d*)\b/);
+                    if (match3) {
+                        score = parseFloat(match3[1]);
+                        if (isNaN(score) || score < 0 || score > 6) score = null;
+                    }
+                }
+
+                return {
+                    score: score,
+                    detail: contentText,
+                    raw: contentText,
+                };
+            }
+
+            // ---------- 主流程：评分 ----------
+            async function handleEvaluate() {
+                if (isEvaluating) return;
+                const text = essayInput.value;
+                if (!text || text.trim().length < 5) {
+                    alert('请先输入或粘贴作文内容。');
+                    return;
+                }
+
+                isEvaluating = true;
+                btnEvaluate.disabled = true;
+                btnEvaluate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 评分中...';
+
+                try {
+                    const lang = langSelect.value;
+                    const result = await evaluateEssay(text, lang);
+                    lastResult = result;
+                    renderResults(result);
+
+                    // 如果 AI 已配置，自动调用？
+                    // 不自动调用，由用户点击
+
+                } catch (err) {
+                    alert('评分出错: ' + err.message);
+                    console.error(err);
+                } finally {
+                    isEvaluating = false;
+                    btnEvaluate.disabled = false;
+                    btnEvaluate.innerHTML = '<i class="fas fa-chart-simple"></i> 开始评分';
+                }
+            }
+
+            // ---------- AI 评分按钮 ----------
+            async function handleAiScore() {
+                if (!lastResult) {
+                    alert('请先点击 "开始评分" 进行本地评估，再调用 AI 评分。');
+                    return;
+                }
+                const provider = aiProvider.value;
+                if (provider === 'none') {
+                    alert('请在配置栏中选择 AI 提供商 (OpenAI 或 Claude)。');
+                    return;
+                }
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    alert('请在配置栏中输入 API Key。');
+                    return;
+                }
+
+                btnAiScore.disabled = true;
+                btnAiScore.innerHTML = '<i class="fas fa-spinner fa-spin"></i> AI 分析中...';
+                aiScoreValue.textContent = '…';
+                aiScoreDetail.innerHTML = '正在调用 AI 模型，请稍候...';
+
+                try {
+                    const text = essayInput.value;
+                    const result = await callAiScore(text, provider, apiKey);
+                    if (result.score !== null && !isNaN(result.score)) {
+                        aiScoreValue.textContent = result.score.toFixed(1);
+                        const stars = '★'.repeat(Math.round(result.score)) + '☆'.repeat(6 - Math.round(result.score));
+                        aiScoreDetail.innerHTML =
+                            `<strong>AI 评分 ${result.score.toFixed(1)} / 6.0</strong> ${stars}<br><span style="font-size:0.85rem;">${result.detail || '分析完成'}</span>`;
+                    } else {
+                        aiScoreValue.textContent = '?';
+                        aiScoreDetail.innerHTML =
+                            `AI 返回了结果但无法解析分数。原始响应：<br><span style="font-size:0.8rem;color:#5a7a9b;">${result.detail || '无内容'}</span>`;
+                    }
+                } catch (err) {
+                    aiScoreValue.textContent = '⚠';
+                    aiScoreDetail.innerHTML = `<span style="color:#dc2626;">AI 评分失败: ${err.message}</span>`;
+                    console.error(err);
+                } finally {
+                    btnAiScore.disabled = false;
+                    btnAiScore.innerHTML = '<i class="fas fa-microchip"></i> 调用 AI 评分';
+                }
+            }
+
+            // ---------- 事件绑定 ----------
+            essayInput.addEventListener('input', updateWordCount);
+            btnEvaluate.addEventListener('click', handleEvaluate);
+            btnClear.addEventListener('click', clearAll);
+            btnExample.addEventListener('click', loadExample);
+            btnAiScore.addEventListener('click', handleAiScore);
+
+            // 配置显示
+            aiProvider.addEventListener('change', function() {
+                const group = document.getElementById('apiKeyGroup');
+                if (this.value === 'none') {
+                    group.style.opacity = '0.4';
+                    apiKeyInput.disabled = true;
+                } else {
+                    group.style.opacity = '1';
+                    apiKeyInput.disabled = false;
+                }
+            });
+            // 初始化
+            aiProvider.dispatchEvent(new Event('change'));
+
+            // 快捷键: Ctrl+Enter 评分
+            essayInput.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    btnEvaluate.click();
+                }
+            });
+
+            // 加载示例
+            loadExample();
+
+            console.log('✅ 托福写作评分系统已加载');
+            console.log('📌 支持 LanguageTool 开源 + 本地算法 + AI 外接');
+            console.log('💡 按 Ctrl+Enter 快速评分');
+
+        })();
+    </script>
+</body>
+</html>
