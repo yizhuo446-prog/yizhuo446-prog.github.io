@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Blue Atelier · Personal Portfolio</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:
+    "Inter",
+    "SF Pro Display",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
+
+
+body{
+
+    background:#F5FAFF;
+    color:#183B56;
+
+    min-height:100vh;
+    padding:40px 20px;
+
+}
+
+
+/* 主容器 */
+
+.container{
+
+    max-width:1200px;
+    margin:auto;
+
+    background:white;
+
+    border-radius:36px;
+
+    padding:40px;
+
+    border:1px solid #D9ECFA;
+
+    box-shadow:
+    0 25px 60px rgba(74,168,232,.12);
+
+}
+
+
+
+/* 导航 */
+
+
+.nav{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+    margin-bottom:40px;
+
+}
+
+
+.nav button{
+
+    border:none;
+
+    background:#EAF6FF;
+
+    color:#397CA8;
+
+    padding:12px 22px;
+
+    border-radius:40px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    transition:.25s;
+
+}
+
+
+.nav button:hover{
+
+    background:#CDEBFF;
+
+}
+
+
+.nav button.active{
+
+    background:#7CC7FF;
+
+    color:white;
+
+}
+
+
+
+
+
+/* 页面 */
+
+
+.page{
+
+    display:none;
+
+}
+
+
+.page.active{
+
+    display:block;
+
+}
+
+
+
+/* 主页 */
+
+
+.profile{
+
+    display:flex;
+
+    gap:40px;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.avatar{
+
+    width:150px;
+
+    height:150px;
+
+    border-radius:50%;
+
+    background:#DDF2FF;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:60px;
+
+    color:#4AA8E8;
+
+}
+
+
+
+.profile h1{
+
+    font-size:42px;
+
+    font-weight:600;
+
+}
+
+
+
+.edit-btn{
+
+    margin-left:15px;
+
+    padding:8px 16px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:#EAF6FF;
+
+    color:#397CA8;
+
+    cursor:pointer;
+
+}
+
+
+
+
+.tag{
+
+    margin-top:15px;
+
+    padding-left:15px;
+
+    border-left:
+
+    4px solid #7CC7FF;
+
+    color:#4A7FA5;
+
+}
+
+
+
+
+.description{
+
+    margin-top:20px;
+
+    max-width:600px;
+
+    line-height:1.8;
+
+    color:#486581;
+
+}
+
+
+
+
+.stats{
+
+    margin-top:30px;
+
+    display:flex;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.stat{
+
+    background:#F0F8FF;
+
+    padding:15px 25px;
+
+    border-radius:30px;
+
+}
+
+
+
+/* 标题 */
+
+
+.section-title{
+
+    font-size:32px;
+
+    margin-bottom:10px;
+
+}
+
+
+.section-desc{
+
+    color:#648BA8;
+
+    margin-bottom:30px;
+
+}
+
+
+
+
+/* 卡片 */
+
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:
+
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:25px;
+
+}
+
+
+
+.card{
+
+    background:#F9FCFF;
+
+    border-radius:28px;
+
+    padding:20px;
+
+    border:
+
+    1px solid #DCEFFA;
+
+    transition:.25s;
+
+}
+
+
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+
+    0 15px 30px rgba(74,168,232,.12);
+
+}
+
+
+
+.card img{
+
+    width:100%;
+
+    height:200px;
+
+    object-fit:cover;
+
+    border-radius:20px;
+
+}
+
+
+
+.placeholder{
+
+    height:200px;
+
+    background:#DDF2FF;
+
+    border-radius:20px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:50px;
+
+    color:#7CC7FF;
+
+}
+
+
+
+
+.card h3{
+
+    margin-top:15px;
+
+    font-size:20px;
+
+}
+
+
+
+.card p{
+
+    margin-top:8px;
+
+    color:#648095;
+
+}
+
+
+
+
+
+/* 上传区域 */
+
+
+.upload{
+
+    margin-top:40px;
+
+    padding-top:30px;
+
+    border-top:
+
+    1px solid #D9ECFA;
+
+}
+
+
+
+input,textarea{
+
+    border:
+
+    1px solid #CFE7F7;
+
+    padding:12px;
+
+    border-radius:30px;
+
+    outline:none;
+
+}
+
+
+
+textarea{
+
+    border-radius:20px;
+
+}
+
+
+
+button.primary{
+
+    background:#4AA8E8;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 25px;
+
+    border-radius:30px;
+
+    cursor:pointer;
+
+}
+
+
+
+
+
+/* 弹窗 */
+
+
+.modal{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:
+
+    rgba(24,59,86,.25);
+
+    backdrop-filter:blur(5px);
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.modal-box{
+
+    background:white;
+
+    padding:35px;
+
+    border-radius:35px;
+
+    width:350px;
+
+}
+
+
+
+</style>
+</head>
+
+
+
+<body>
+
+
+<div class="container">
+
+
+<!-- 导航 -->
+
+<div class="nav">
+
+<button class="active"
+onclick="showPage('home')">
+
+<i class="fa-solid fa-house"></i>
+主页
+
+</button>
+
+
+<button onclick="showPage('art')">
+
+<i class="fa-solid fa-palette"></i>
+艺术作品
+
+</button>
+
+
+<button onclick="showPage('events')">
+
+<i class="fa-solid fa-calendar"></i>
+活动展示
+
+</button>
+
+
+<button onclick="showPage('portfolio')">
+
+<i class="fa-solid fa-folder"></i>
+活动作品集
+
+</button>
+
+
+</div>
+
+
+
+
+
+<!-- HOME -->
+
+<section id="home" class="page active">
+
+
+<div class="profile">
+
+
+<div class="avatar">
+
+<i class="fa-solid fa-user-astronaut"></i>
+
+</div>
+
+
+<div>
+
+
+<h1>
+
+<span id="name">
+
+Blue Atelier
+
+</span>
+
+
+<button class="edit-btn"
+onclick="openNameEdit()">
+
+<i class="fa-solid fa-pen"></i>
+
+修改名字
+
+</button>
+
+</h1>
+
+
+<div class="tag">
+
+艺术 · 视觉 · 创造
+
+</div>
+
+
+<p class="description">
+
+探索绘画、空间、设计与思想之间的关系。
+这里记录个人作品、展览活动以及长期项目。
+
+</p>
+
+
+<div class="stats">
+
+
+<div class="stat">
+🎨 艺术作品 <span id="artCount">0</span>
+</div>
+
+
+<div class="stat">
+📅 活动 <span id="eventCount">0</span>
+</div>
+
+
+<div class="stat">
+📂 作品集 <span id="portfolioCount">0</span>
+</div>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</section>
+
+
+
+
+
+<!-- ART -->
+
+<section id="art" class="page">
+
+
+<h2 class="section-title">
+艺术作品
+</h2>
+
+<p class="section-desc">
+作品图片、名称、介绍
+</p>
+
+
+<div id="artGrid" class="grid"></div>
+
+
+
+<div class="upload">
+
+<input id="artImage"
+type="file"
+accept="image/*">
+
+
+<input id="artName"
+placeholder="作品名称">
+
+
+<textarea id="artDesc"
+placeholder="作品介绍"></textarea>
+
+
+<button class="primary"
+onclick="addArt()">
+
+添加作品
+
+</button>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<!-- EVENTS -->
+
+<section id="events" class="page">
+
+
+<h2 class="section-title">
+活动展示
+</h2>
+
+
+<p class="section-desc">
+展览、比赛、活动记录
+</p>
+
+
+<div id="eventGrid"
+class="grid"></div>
+
+
+
+<div class="upload">
+
+<input id="eventImage"
+type="file"
+accept="image/*">
+
+
+<input id="eventName"
+placeholder="活动名称">
+
+
+<button class="primary"
+onclick="addEvent()">
+
+添加活动
+
+</button>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<!-- PORTFOLIO -->
+
+<section id="portfolio" class="page">
+
+
+<h2 class="section-title">
+
+活动作品集
+
+</h2>
+
+
+<p class="section-desc">
+
+PDF、文档、外部链接
+
+</p>
+
+
+<div id="portfolioGrid"
+class="grid"></div>
+
+
+
+<div class="upload">
+
+
+<input id="pdfFile"
+type="file"
+accept=".pdf">
+
+
+<input id="portfolioName"
+placeholder="作品集名称">
+
+
+<button class="primary"
+onclick="addPortfolio()">
+
+添加作品集
+
+</button>
+
+
+</div>
+
+
+</section>
+
+
+</div>
+
+
+
+
+<!-- 名字弹窗 -->
+
+
+<div id="nameModal"
+class="modal">
+
+
+<div class="modal-box">
+
+
+<h3>
+修改名字
+</h3>
+
+
+<br>
+
+
+<input id="newName"
+placeholder="输入名字">
+
+
+<br><br>
+
+
+<button class="primary"
+onclick="saveName()">
+
+保存
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* Part 2 接这里 */
+
+
+</script>
+
+
+</body>
+
+</html>
+<script>
+
+
+/* =========================
+   数据系统
+========================= */
+
+
+let arts =
+JSON.parse(localStorage.getItem("arts"))
+|| [];
+
+
+let events =
+JSON.parse(localStorage.getItem("events"))
+|| [];
+
+
+let portfolios =
+JSON.parse(localStorage.getItem("portfolios"))
+|| [];
+
+
+
+let userName =
+localStorage.getItem("userName")
+|| "Blue Atelier";
+
+
+
+document.getElementById("name").innerText=userName;
+
+
+
+/* =========================
+   页面切换
+========================= */
+
+
+function showPage(id){
+
+    document.querySelectorAll(".page")
+    .forEach(page=>{
+        page.classList.remove("active");
+    });
+
+
+    document.getElementById(id)
+    .classList.add("active");
+
+
+    document.querySelectorAll(".nav button")
+    .forEach(btn=>{
+        btn.classList.remove("active");
+    });
+
+
+    event.target.classList.add("active");
+
+}
+
+
+
+
+
+/* =========================
+   名字修改
+========================= */
+
+
+function openNameEdit(){
+
+    document
+    .getElementById("nameModal")
+    .style.display="flex";
+
+}
+
+
+
+function saveName(){
+
+    let value =
+    document
+    .getElementById("newName")
+    .value
+    .trim();
+
+
+    if(value){
+
+        userName=value;
+
+        localStorage.setItem(
+            "userName",
+            value
+        );
+
+
+        document
+        .getElementById("name")
+        .innerText=value;
+
+    }
+
+
+    document
+    .getElementById("nameModal")
+    .style.display="none";
+
+}
+
+
+
+
+
+/* =========================
+   图片转换
+========================= */
+
+
+function imageToURL(file){
+
+    return new Promise(resolve=>{
+
+
+        if(!file){
+
+            resolve("");
+
+            return;
+
+        }
+
+
+        let reader =
+        new FileReader();
+
+
+        reader.onload=function(){
+
+            resolve(reader.result);
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+
+    });
+
+}
+
+
+
+
+
+
+
+/* =========================
+   添加艺术作品
+========================= */
+
+
+async function addArt(){
+
+
+let file =
+document
+.getElementById("artImage")
+.files[0];
+
+
+let img =
+await imageToURL(file);
+
+
+
+let item={
+
+
+id:Date.now(),
+
+
+name:
+document
+.getElementById("artName")
+.value
+||"未命名作品",
+
+
+desc:
+document
+.getElementById("artDesc")
+.value
+||"暂无介绍",
+
+
+img:img
+
+
+
+};
+
+
+
+arts.push(item);
+
+
+
+localStorage.setItem(
+"arts",
+JSON.stringify(arts)
+);
+
+
+
+renderArts();
+
+
+
+document
+.getElementById("artName")
+.value="";
+
+
+document
+.getElementById("artDesc")
+.value="";
+
+}
+
+
+
+
+/* =========================
+   添加活动
+========================= */
+
+
+async function addEvent(){
+
+
+let file=
+document
+.getElementById("eventImage")
+.files[0];
+
+
+let img=
+await imageToURL(file);
+
+
+
+let item={
+
+
+id:Date.now(),
+
+
+name:
+document
+.getElementById("eventName")
+.value
+||"未命名活动",
+
+
+img:img
+
+
+};
+
+
+
+events.push(item);
+
+
+
+localStorage.setItem(
+"events",
+JSON.stringify(events)
+);
+
+
+
+renderEvents();
+
+
+}
+
+
+
+
+
+/* =========================
+   添加PDF作品集
+========================= */
+
+
+async function addPortfolio(){
+
+
+
+let file=
+document
+.getElementById("pdfFile")
+.files[0];
+
+
+
+if(!file){
+
+alert("请选择PDF文件");
+
+return;
+
+}
+
+
+
+let pdfURL =
+await imageToURL(file);
+
+
+
+let item={
+
+
+id:Date.now(),
+
+
+name:
+
+document
+.getElementById("portfolioName")
+.value
+||file.name,
+
+
+pdf:pdfURL,
+
+
+filename:file.name
+
+
+
+};
+
+
+
+portfolios.push(item);
+
+
+
+localStorage.setItem(
+"portfolios",
+JSON.stringify(portfolios)
+);
+
+
+
+renderPortfolios();
+
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   渲染艺术作品
+========================= */
+
+
+function renderArts(){
+
+
+let box=
+document
+.getElementById("artGrid");
+
+
+
+box.innerHTML="";
+
+
+
+arts.forEach(item=>{
+
+
+box.innerHTML+=`
+
+
+<div class="card">
+
+
+${
+item.img ?
+
+`
+<img src="${item.img}"
+onclick="openImage('${item.img}')">
+`
+
+:
+
+`
+
+<div class="placeholder">
+🎨
+</div>
+
+`
+
+}
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+<p>
+${item.desc}
+</p>
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+
+document
+.getElementById("artCount")
+.innerText=arts.length;
+
+
+
+}
+
+
+
+
+
+/* =========================
+   渲染活动
+========================= */
+
+
+function renderEvents(){
+
+
+let box=
+document
+.getElementById("eventGrid");
+
+
+
+box.innerHTML="";
+
+
+
+events.forEach(item=>{
+
+
+box.innerHTML+=`
+
+
+<div class="card">
+
+
+${
+item.img?
+
+`
+<img src="${item.img}">
+`
+
+:
+
+`
+<div class="placeholder">
+📅
+</div>
+`
+
+}
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+document
+.getElementById("eventCount")
+.innerText=events.length;
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   渲染作品集
+========================= */
+
+
+function renderPortfolios(){
+
+
+let box=
+document
+.getElementById("portfolioGrid");
+
+
+
+box.innerHTML="";
+
+
+
+portfolios.forEach(item=>{
+
+
+box.innerHTML+=`
+
+
+<div class="card">
+
+
+<div class="placeholder">
+
+<i class="fa-solid fa-file-pdf"></i>
+
+</div>
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+
+<a href="${item.pdf}"
+target="_blank"
+class="primary"
+style="
+display:inline-block;
+margin-top:15px;
+text-decoration:none;
+">
+
+
+打开 PDF
+
+
+</a>
+
+
+
+</div>
+
+
+
+`;
+
+
+});
+
+
+
+document
+.getElementById("portfolioCount")
+.innerText=
+portfolios.length;
+
+
+}
+
+
+
+
+
+
+/* =========================
+ 图片放大
+========================= */
+
+
+function openImage(src){
+
+
+let win =
+window.open();
+
+
+win.document.write(`
+
+<img src="${src}"
+style="
+width:100%;
+height:auto;
+">
+
+`);
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+ 初始化
+========================= */
+
+
+renderArts();
+
+renderEvents();
+
+renderPortfolios();
+
+
+
+
+</script>
+
+ 
+
+/* =========================
+   删除艺术作品
+========================= */
+
+
+function deleteArt(id){
+
+    arts =
+    arts.filter(
+        item=>item.id!==id
+    );
+
+
+    localStorage.setItem(
+        "arts",
+        JSON.stringify(arts)
+    );
+
+
+    renderArts();
+
+}
+
+
+
+
+
+/* =========================
+   删除活动
+========================= */
+
+
+function deleteEvent(id){
+
+
+    events =
+    events.filter(
+        item=>item.id!==id
+    );
+
+
+    localStorage.setItem(
+        "events",
+        JSON.stringify(events)
+    );
+
+
+    renderEvents();
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   删除作品集
+========================= */
+
+
+function deletePortfolio(id){
+
+
+    portfolios =
+    portfolios.filter(
+        item=>item.id!==id
+    );
+
+
+    localStorage.setItem(
+        "portfolios",
+        JSON.stringify(portfolios)
+    );
+
+
+    renderPortfolios();
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   重新增强作品卡片
+========================= */
+
+
+function addDeleteButtons(){
+
+
+document.querySelectorAll(".card")
+.forEach(card=>{
+
+
+card.style.position="relative";
+
+
+});
+
+}
+
+
+
+ 
+
+
+
+
+
+
+
+/* =========================
+   修改艺术作品渲染
+========================= */
+
+
+function enhancedRenderArts(){
+
+
+let box=
+document.getElementById("artGrid");
+
+
+box.innerHTML="";
+
+
+
+arts.forEach(item=>{
+
+
+box.innerHTML+=`
+
+<div class="card">
+
+
+${
+item.img?
+
+`
+<img src="${item.img}"
+onclick="openImage('${item.img}')">
+`
+
+:
+
+`
+<div class="placeholder">
+🎨
+</div>
+`
+
+}
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+<p>
+${item.desc}
+</p>
+
+
+
+<button
+onclick="deleteArt(${item.id})"
+style="
+margin-top:15px;
+background:#FFE8EE;
+color:#D45B75;
+border:none;
+padding:8px 18px;
+border-radius:30px;
+cursor:pointer;
+">
+
+删除
+
+</button>
+
+
+</div>
+
+`;
+
+});
+
+
+document
+.getElementById("artCount")
+.innerText=arts.length;
+
+
+}
+
+
+
+
+
+/* =========================
+   活动增强
+========================= */
+
+
+function enhancedRenderEvents(){
+
+
+let box=
+document.getElementById("eventGrid");
+
+
+box.innerHTML="";
+
+
+events.forEach(item=>{
+
+
+box.innerHTML+=`
+
+<div class="card">
+
+
+${
+item.img?
+
+`
+<img src="${item.img}">
+`
+
+:
+
+`
+<div class="placeholder">
+📅
+</div>
+`
+
+}
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+<button
+onclick="deleteEvent(${item.id})"
+style="
+margin-top:15px;
+background:#FFE8EE;
+color:#D45B75;
+border:none;
+padding:8px 18px;
+border-radius:30px;
+cursor:pointer;
+">
+
+删除
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+document
+.getElementById("eventCount")
+.innerText=events.length;
+
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   PDF增强
+========================= */
+
+
+function enhancedRenderPortfolios(){
+
+
+let box=
+document
+.getElementById("portfolioGrid");
+
+
+box.innerHTML="";
+
+
+
+portfolios.forEach(item=>{
+
+
+box.innerHTML+=`
+
+
+<div class="card">
+
+
+<div class="placeholder">
+
+<i class="fa-solid fa-file-pdf"></i>
+
+</div>
+
+
+
+<h3>
+${item.name}
+</h3>
+
+
+
+
+<a href="${item.pdf}"
+target="_blank"
+class="primary"
+style="
+display:inline-block;
+text-decoration:none;
+margin-top:15px;
+">
+
+
+查看 PDF
+
+
+</a>
+
+
+
+
+<a href="${item.pdf}"
+download="${item.filename}"
+class="primary"
+style="
+display:inline-block;
+text-decoration:none;
+margin-top:15px;
+margin-left:10px;
+">
+
+
+下载
+
+
+</a>
+
+
+
+
+<br>
+
+
+<button
+onclick="deletePortfolio(${item.id})"
+
+style="
+margin-top:15px;
+background:#FFE8EE;
+color:#D45B75;
+border:none;
+padding:8px 18px;
+border-radius:30px;
+cursor:pointer;
+">
+
+删除
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+
+document
+.getElementById("portfolioCount")
+.innerText=
+portfolios.length;
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   头像上传
+========================= */
+
+
+function uploadAvatar(file){
+
+
+let reader =
+new FileReader();
+
+
+
+reader.onload=function(e){
+
+
+document
+.querySelector(".avatar")
+.innerHTML=
+`
+
+<img src="${e.target.result}"
+style="
+width:100%;
+height:100%;
+border-radius:50%;
+object-fit:cover;
+">
+
+`;
+
+
+localStorage.setItem(
+"avatar",
+e.target.result
+);
+
+
+};
+
+
+
+reader.readAsDataURL(file);
+
+
+}
+
+
+
+
+
+/* =========================
+   恢复头像
+========================= */
+
+
+let savedAvatar =
+localStorage.getItem("avatar");
+
+
+if(savedAvatar){
+
+
+document
+.querySelector(".avatar")
+.innerHTML=
+
+`
+
+<img src="${savedAvatar}"
+
+style="
+width:100%;
+height:100%;
+border-radius:50%;
+object-fit:cover;
+">
+
+`;
+
+}
+
+
+
+
+
+
+
+/* =========================
+   数据备份
+========================= */
+
+
+function exportData(){
+
+
+let data={
+
+name:userName,
+
+arts:arts,
+
+events:events,
+
+portfolios:portfolios
+
+};
+
+
+
+let blob =
+new Blob(
+[
+JSON.stringify(
+data,
+null,
+2
+)
+
+],
+
+{
+type:"application/json"
+}
+
+);
+
+
+
+let url =
+URL.createObjectURL(blob);
+
+
+
+let a =
+document.createElement("a");
+
+
+a.href=url;
+
+
+a.download=
+"Blue_Atelier_backup.json";
+
+
+a.click();
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   替换旧渲染
+========================= */
+
+
+renderArts =
+enhancedRenderArts;
+
+
+renderEvents =
+enhancedRenderEvents;
+
+
+renderPortfolios =
+enhancedRenderPortfolios;
+
+
+
+renderArts();
+
+renderEvents();
+
+renderPortfolios();
+
