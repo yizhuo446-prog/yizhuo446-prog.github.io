@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🍰 一页手帐 · 便签生成器</title>
+    <!-- 引入多种开源字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Quicksand:wght@400;600;700&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f7f3ed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Quicksand', sans-serif;
+            padding: 20px;
+        }
+        .container {
+            background: #fff8f2;
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.03);
+            padding: 28px 24px 32px;
+            max-width: 520px;
+            width: 100%;
+            transition: 0.2s;
+        }
+        h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #b47c6e;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        h2 small {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: #c9aca0;
+            margin-left: 4px;
+        }
+        .control-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 8px;
+            background: #fcf5ef;
+            padding: 14px 12px;
+            border-radius: 36px;
+            margin-bottom: 18px;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: white;
+            padding: 4px 14px 4px 10px;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            border: 1px solid #f0e3db;
+        }
+        .control-item label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #a58374;
+            letter-spacing: 0.3px;
+        }
+        .control-item select, 
+        .control-item input {
+            border: none;
+            background: transparent;
+            font-size: 0.75rem;
+            padding: 6px 0;
+            font-weight: 500;
+            color: #5c4036;
+            outline: none;
+            font-family: 'Quicksand', sans-serif;
+            max-width: 100px;
+        }
+        .control-item select {
+            cursor: pointer;
+        }
+        .control-item input[type="color"] {
+            width: 30px;
+            height: 30px;
+            border-radius: 40px;
+            padding: 2px;
+            border: 1px solid #dccfc7;
+            background: white;
+            cursor: pointer;
+        }
+        .sticker-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin: 6px 0 14px;
+        }
+        .sticker-btn {
+            background: white;
+            border: 1px solid #eddcd2;
+            border-radius: 60px;
+            padding: 3px 12px 3px 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.75rem;
+            color: #6d4d3e;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: 0.15s;
+            font-weight: 500;
+        }
+        .sticker-btn:hover {
+            background: #fffaf5;
+            border-color: #ccb3a5;
+            transform: scale(0.96);
+        }
+        .sticker-btn img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+        .sticker-btn span {
+            font-size: 0.65rem;
+            opacity: 0.7;
+        }
+
+        /* ===== 手帐卡片 — 巴掌大小 ===== */
+        .notebook {
+            border-radius: 36px 36px 28px 28px;
+            padding: 20px 18px 22px;
+            box-shadow: 0 8px 0 #e5d3c7, 0 12px 28px rgba(110, 70, 50, 0.08);
+            border: 1px solid #f5e6dd;
+            transition: 0.2s;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 16px;
+            position: relative;
+            background: #fffcf9; /* fallback */
+        }
+        /* 背景风格：纯色、格子、星星 */
+        .bg-solid {
+            background: #fffcf9;
+        }
+        .bg-grid {
+            background-image: 
+                linear-gradient(rgba(200, 180, 165, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 180, 165, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+            background-color: #fffcf9;
+        }
+        .bg-stars {
+            background-color: #fffcf9;
+            background-image: 
+                radial-gradient(circle at 10% 20%, #f5e3d8 1.5px, transparent 1.5px),
+                radial-gradient(circle at 80% 40%, #f0d9cc 2px, transparent 2px),
+                radial-gradient(circle at 30% 70%, #f0d9cc 1.5px, transparent 1.5px),
+                radial-gradient(circle at 70% 85%, #f5e3d8 2px, transparent 2px),
+                radial-gradient(circle at 50% 30%, #f5e3d8 1px, transparent 1px);
+            background-size: 100% 100%;
+        }
+        .notebook-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .date-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px dashed #f0ded4;
+            padding-bottom: 10px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            color: #6b4d3e;
+        }
+        .date-area .day {
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .date-area .nickname {
+            background: #f2e3da;
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #4e342b;
+            letter-spacing: 0.5px;
+        }
+        .content-area {
+            font-size: 1rem;
+            line-height: 1.6;
+            padding: 8px 4px 12px;
+            min-height: 80px;
+            color: #3b2a23;
+            word-break: break-word;
+            font-weight: 500;
+        }
+        .sticker-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 8px;
+            margin: 2px 0 4px;
+            min-height: 34px;
+            align-items: center;
+        }
+        .sticker-area img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            background: rgba(255, 245, 235, 0.4);
+            border-radius: 20px;
+            padding: 2px;
+            transition: 0.1s;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 18px 0 6px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: white;
+            border: 1px solid #dccfc7;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #5a3f35;
+            font-size: 0.9rem;
+            box-shadow: 0 3px 0 #d5c2b6;
+            cursor: pointer;
+            transition: 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fcf7f2;
+        }
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 0px 0 #d5c2b6;
+        }
+        .btn-primary {
+            background: #fbede6;
+            border-color: #dbbcae;
+            color: #4f362d;
+        }
+        .btn-export {
+            background: #ffede5;
+            border-color: #dbb8a8;
+            font-weight: 600;
+        }
+        .btn img {
+            width: 20px;
+            height: 20px;
+        }
+        .footnote {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #c6afa3;
+            margin-top: 12px;
+        }
+
+        /* ===== 字体样式 ===== */
+        .font-cream { font-family: 'Quicksand', 'Segoe UI', sans-serif; }
+        .font-pixel { font-family: 'Press Start 2P', 'Courier New', monospace; letter-spacing: 0.5px; }
+        .font-pixel .content-area { font-size: 0.75rem; line-height: 1.8; }
+        .font-pixel .date-area { font-size: 0.7rem; }
+        .font-mazan { font-family: 'Ma Shan Zheng', cursive; }
+        .font-mazan .content-area { font-size: 1.1rem; line-height: 1.7; }
+        .font-zcool { font-family: 'ZCOOL KuaiLe', cursive; }
+        .font-zcool .content-area { font-size: 1.05rem; line-height: 1.7; }
+
+        /* 响应式 */
+        @media (max-width: 420px) {
+            .container { padding: 16px; }
+            .control-bar { gap: 6px; }
+        }
+        .sticker-btn img[src=""] { display: none; }
+    </style>
+</head>
+<body>
+<div class="container" id="appContainer">
+    <h2>
+        🧁 手帐便签
+        <small>· 一页</small>
+    </h2>
+
+    <!-- 控制栏 (新增背景风格 & 更多字体) -->
+    <div class="control-bar">
+        <div class="control-item">
+            <label>📅</label>
+            <input type="date" id="datePicker" value="2026-07-11">
+        </div>
+        <div class="control-item">
+            <label>✏️</label>
+            <input type="text" id="nicknameInput" placeholder="昵称" value="小棉花" maxlength="10">
+        </div>
+        <div class="control-item">
+            <label>🖋</label>
+            <select id="fontSelect">
+                <option value="font-cream">奶油体</option>
+                <option value="font-pixel">像素体</option>
+                <option value="font-mazan">马善政</option>
+                <option value="font-zcool">酷乐体</option>
+            </select>
+        </div>
+        <div class="control-item">
+            <label>🎨</label>
+            <select id="bgStyleSelect">
+                <option value="bg-solid">纯色</option>
+                <option value="bg-grid">格子</option>
+                <option value="bg-stars">星星</option>
+            </select>
+        </div>
+        <div class="control-item">
+            <label>🎚</label>
+            <input type="color" id="bgColorPicker" value="#fffcf9">
+        </div>
+    </div>
+
+    <!-- 贴纸区 (开源可爱图片) -->
+    <div class="sticker-panel">
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f33b.png">🌸 <span>花</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f33c.png">🌼 <span>花</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f496.png">💖 <span>花</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f49c.png">💜 <span>花</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f47b.png">👻 <span>人物</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f43e.png">🐾 <span>人物</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f435.png">🐵 <span>人物</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f436.png">🐶 <span>人物</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f338.png">🌷 <span>花</span></button>
+        <button class="sticker-btn" data-sticker="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f33a.png">🌺 <span>花</span></button>
+    </div>
+
+    <!-- 手帐卡片 (巴掌大小) -->
+    <div class="notebook bg-solid" id="notebookCard">
+        <div class="notebook-content" id="notebookContent">
+            <div class="date-area" id="dateDisplay">
+                <span class="day" id="dayText">2026.07.11</span>
+                <span class="nickname" id="nicknameDisplay">小棉花</span>
+            </div>
+            <div class="content-area" id="contentDisplay" contenteditable="true" role="textbox" aria-multiline="true">
+                今天吃了草莓蛋糕 🍰<br>阳光很好~
+            </div>
+            <div class="sticker-area" id="stickerArea"></div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <button class="btn btn-primary" id="clearStickersBtn">🧹 清空贴纸</button>
+        <button class="btn btn-export" id="exportBtn">⬇️ 导出图片</button>
+    </div>
+    <div class="footnote">✧ 点击内容可编辑 · 贴纸点击即删 ✧</div>
+</div>
+
+<script>
+    (function() {
+        // DOM refs
+        const datePicker = document.getElementById('datePicker');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const fontSelect = document.getElementById('fontSelect');
+        const bgStyleSelect = document.getElementById('bgStyleSelect');
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const notebookCard = document.getElementById('notebookCard');
+        const notebookContent = document.getElementById('notebookContent');
+        const dayText = document.getElementById('dayText');
+        const nicknameDisplay = document.getElementById('nicknameDisplay');
+        const contentDisplay = document.getElementById('contentDisplay');
+        const stickerArea = document.getElementById('stickerArea');
+        const clearStickersBtn = document.getElementById('clearStickersBtn');
+        const exportBtn = document.getElementById('exportBtn');
+
+        let stickerList = [];
+
+        // ---------- 日期格式化 ----------
+        function formatDate(dateStr) {
+            if (!dateStr) return '2026.07.11';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[0]}.${parts[1]}.${parts[2]}`;
+        }
+        function updateDateDisplay() {
+            dayText.textContent = formatDate(datePicker.value);
+        }
+
+        // 昵称
+        function updateNickname() {
+            const val = nicknameInput.value.trim() || '小棉花';
+            nicknameDisplay.textContent = val;
+        }
+
+        // ----- 字体更新 (新增) -----
+        function updateFont() {
+            const fontClass = fontSelect.value;
+            // 移除所有字体类
+            notebookContent.classList.remove('font-cream', 'font-pixel', 'font-mazan', 'font-zcool');
+            if (fontClass) {
+                notebookContent.classList.add(fontClass);
+            } else {
+                notebookContent.classList.add('font-cream');
+            }
+        }
+
+        // ----- 背景风格 + 颜色 -----
+        function updateBgStyle() {
+            const style = bgStyleSelect.value;
+            notebookCard.classList.remove('bg-solid', 'bg-grid', 'bg-stars');
+            notebookCard.classList.add(style);
+            // 颜色由 color picker 控制
+            applyBgColor();
+        }
+
+        function applyBgColor() {
+            const color = bgColorPicker.value || '#fffcf9';
+            // 对于格子/星星，背景颜色作为基底
+            notebookCard.style.backgroundColor = color;
+            // 但格子/星星有背景图，保留背景图，仅修改底色
+            // 如果是纯色，直接使用背景色
+            if (bgStyleSelect.value === 'bg-solid') {
+                notebookCard.style.backgroundImage = 'none';
+            } else if (bgStyleSelect.value === 'bg-grid') {
+                // 保留格子，但背景色修改
+                notebookCard.style.backgroundImage = 'linear-gradient(rgba(200,180,165,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(200,180,165,0.15) 1px, transparent 1px)';
+                notebookCard.style.backgroundSize = '24px 24px';
+            } else if (bgStyleSelect.value === 'bg-stars') {
+                notebookCard.style.backgroundImage = 'radial-gradient(circle at 10% 20%, #f5e3d8 1.5px, transparent 1.5px), radial-gradient(circle at 80% 40%, #f0d9cc 2px, transparent 2px), radial-gradient(circle at 30% 70%, #f0d9cc 1.5px, transparent 1.5px), radial-gradient(circle at 70% 85%, #f5e3d8 2px, transparent 2px), radial-gradient(circle at 50% 30%, #f5e3d8 1px, transparent 1px)';
+                notebookCard.style.backgroundSize = '100% 100%';
+            }
+        }
+
+        // ---------- 贴纸 ----------
+        function renderStickers() {
+            stickerArea.innerHTML = '';
+            stickerList.forEach(src => {
+                if (!src) return;
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'sticker';
+                img.loading = 'lazy';
+                img.style.imageRendering = 'pixelated';
+                img.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const idx = stickerList.indexOf(src);
+                    if (idx !== -1) {
+                        stickerList.splice(idx, 1);
+                        renderStickers();
+                    }
+                });
+                stickerArea.appendChild(img);
+            });
+        }
+
+        function addSticker(src) {
+            if (!src) return;
+            if (stickerList.length >= 12) {
+                alert('贴纸有点多啦，先移除一些吧 (点击贴纸可删除)');
+                return;
+            }
+            stickerList.push(src);
+            renderStickers();
+        }
+
+        function clearStickers() {
+            stickerList = [];
+            renderStickers();
+        }
+
+        // ---------- 导出 (html2canvas) ----------
+        function performExport() {
+            const card = document.getElementById('notebookCard');
+            html2canvas(card, {
+                scale: 3,
+                backgroundColor: null,
+                allowTaint: false,
+                useCORS: true,
+                logging: false,
+                imageTimeout: 0,
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `手帐_${new Date().toISOString().slice(0,10)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.warn(err);
+                alert('导出失败, 可尝试刷新或检查网络');
+            });
+        }
+
+        function loadHtml2canvasAndExport() {
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                document.head.appendChild(script);
+                script.onload = function() { performExport(); };
+                script.onerror = function() { alert('加载导出库失败, 请检查网络'); };
+            } else {
+                performExport();
+            }
+        }
+
+        // ---------- 事件绑定 ----------
+        datePicker.addEventListener('change', updateDateDisplay);
+        nicknameInput.addEventListener('input', updateNickname);
+        fontSelect.addEventListener('change', updateFont);
+        bgStyleSelect.addEventListener('change', function() {
+            updateBgStyle();
+            applyBgColor();
+        });
+        bgColorPicker.addEventListener('input', applyBgColor);
+
+        // 贴纸按钮
+        document.querySelector('.sticker-panel').addEventListener('click', function(e) {
+            const btn = e.target.closest('.sticker-btn');
+            if (!btn) return;
+            const src = btn.dataset.sticker;
+            if (src) addSticker(src);
+        });
+
+        clearStickersBtn.addEventListener('click', clearStickers);
+        exportBtn.addEventListener('click', loadHtml2canvasAndExport);
+
+        // ---------- 初始化 ----------
+        updateDateDisplay();
+        updateNickname();
+        updateFont();
+        updateBgStyle();
+        applyBgColor();
+
+        // 默认贴纸示例
+        stickerList = [
+            'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f33b.png',
+            'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/72x72/1f436.png'
+        ];
+        renderStickers();
+
+        console.log('🍰 手帐便签已加载！');
+    })();
+</script>
+<!-- 加载 html2canvas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+</body>
+</html>
