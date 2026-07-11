@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>词汇远征队 · 40关托福闯关</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #f0f4ff 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .container {
+            max-width: 780px;
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.3);
+            padding: 28px 24px;
+            border: 1px solid rgba(255,255,255,0.7);
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+        h1 { font-size: 2rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 10px; }
+        h1 small { font-size: 0.8rem; font-weight: 400; color: #64748b; margin-left: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 18px;
+            border: 1px solid #f1f5f9;
+        }
+        .btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; transform: scale(0.97); }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: transparent; border: 2px solid #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .grid-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .level-node {
+            aspect-ratio: 1;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: #e2e8f0;
+            color: #94a3b8;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: default;
+            padding: 4px;
+            text-align: center;
+        }
+        .level-node.unlocked { background: #dbeafe; color: #1e40af; border-color: #93c5fd; cursor: pointer; }
+        .level-node.unlocked:hover { transform: scale(1.05); background: #bfdbfe; }
+        .level-node.completed { background: #bbf7d0; color: #166534; border-color: #86efac; cursor: pointer; }
+        .level-node.completed:hover { transform: scale(1.05); }
+        .level-node.locked { opacity: 0.5; }
+        .level-node .badge { font-size: 0.6rem; font-weight: 400; background: rgba(0,0,0,0.05); padding: 0 6px; border-radius: 30px; margin-top: 2px; }
+        .level-node .star { color: #f59e0b; }
+        .word-display { font-size: 2.8rem; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .pos-theme { color: #64748b; font-size: 0.9rem; margin-bottom: 14px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+        }
+        .option-btn:hover:not(:disabled) { background: #e2e8f0; transform: scale(0.97); }
+        .option-btn.correct { background: #bbf7d0; border-color: #22c55e; }
+        .option-btn.wrong { background: #fecaca; border-color: #ef4444; }
+        .option-btn:disabled { cursor: default; opacity: 0.6; }
+        .stats-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 500; color: #334155; }
+        .lives { display: flex; gap: 2px; align-items: center; font-size: 1.2rem; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
+        .text-center { text-align: center; }
+        .text-muted { color: #94a3b8; }
+        .wrong-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .theme-badge { background: #dbeafe; color: #1e40af; border-radius: 30px; padding: 2px 12px; font-size: 0.7rem; font-weight: 600; }
+        .toast { background: #0f172a; color: white; padding: 12px 28px; border-radius: 60px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: none; z-index: 999; white-space: nowrap; }
+        .toast.show { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .scroll-levels { max-height: 280px; overflow-y: auto; padding-right: 4px; }
+        @media (max-width: 500px) { .options { grid-template-columns: 1fr; } .grid-levels { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 登录 -->
+    <div id="page-login" class="page active">
+        <div class="text-center" style="padding: 30px 0 10px;">
+            <h1 style="justify-content:center;">🧭 词汇远征队</h1>
+            <p style="color: #64748b; margin: 6px 0 24px;">40关 · 800托福核心词 · 主题闯关</p>
+            <div class="card" style="max-width: 360px; margin: 0 auto;">
+                <label style="font-weight:600;">账号 (任意昵称)</label>
+                <input id="login-username" type="text" placeholder="输入你的名字" value="探险家"
+                       style="width:100%; padding:14px 16px; border-radius:40px; border:2px solid #e2e8f0; margin:10px 0 18px; font-size:1rem;" />
+                <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="login()">🚀 出发</button>
+                <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px;">数据保存在本地浏览器</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主菜单 -->
+    <div id="page-menu" class="page">
+        <div class="flex-between">
+            <h1>🧭 远征 <small id="menu-username"></small></h1>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="showWrongBook()">📕 错题</button>
+                <button class="btn btn-outline" onclick="showThemeStats()">📊 主题</button>
+                <button class="btn btn-outline" onclick="resetAll()" style="color:#ef4444;">🔄 重置</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stats-bar">
+                <span>🏆 总分: <strong id="menu-total-score">0</strong></span>
+                <span>✅ 正确: <strong id="menu-total-correct">0</strong></span>
+                <span>❌ 错误: <strong id="menu-total-wrong">0</strong></span>
+                <span>📌 进度: <strong id="menu-progress">0/40</strong></span>
+            </div>
+        </div>
+        <div class="card" style="padding:12px;">
+            <div style="font-weight:600; margin-bottom:8px; font-size:0.9rem; color:#475569;">🗺️ 点击已解锁关卡开始 (绿=通关, 蓝=可挑战)</div>
+            <div class="scroll-levels">
+                <div class="grid-levels" id="level-grid"></div>
+            </div>
+        </div>
+        <div class="text-center mt-2 text-muted" style="font-size:0.8rem;">每关20词 · 5条命 · 答错扣命</div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="page-game" class="page">
+        <div class="flex-between">
+            <span><span id="game-level-label">第 1 关</span> · <span id="game-stage">1</span>/20</span>
+            <span class="lives" id="game-lives-display"></span>
+            <span>💯 <span id="game-score">0</span></span>
+        </div>
+        <div class="card" style="margin-top:8px;">
+            <div class="word-display" id="game-word">—</div>
+            <div class="pos-theme" id="game-pos-theme">📚 主题 · General</div>
+            <div class="options" id="game-options">
+                <button class="option-btn" data-index="0">-</button>
+                <button class="option-btn" data-index="1">-</button>
+                <button class="option-btn" data-index="2">-</button>
+                <button class="option-btn" data-index="3">-</button>
+            </div>
+            <div id="game-feedback" style="margin-top:14px; font-weight:500; text-align:center; min-height:28px;"></div>
+            <div style="margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="exitGame()">🚪 退出</button>
+                <button class="btn btn-outline" id="btn-next" style="display:none;" onclick="nextQuestion()">⏩ 下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错题本 -->
+    <div id="page-wrongbook" class="page">
+        <h1>📕 错题本</h1>
+        <div class="card" id="wrong-list-container"><p class="text-muted">暂无错题</p></div>
+        <button class="btn btn-outline" onclick="backToMenu()">⬅ 返回</button>
+    </div>
+
+    <!-- 主题统计 -->
+    <div id="page-theme" class="page">
+        <h1>📊 主题掌握度</h1>
+        <div class="card" id="theme-stats-container"><p class="text-muted">暂无数据</p></div>
+        <button class="btn btn-outline" onclick="backToMenu()">⬅ 返回</button>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ============================================================
+// 1. 超大学术词库 (8大主题 × 100词 = 800词)
+//    完全匹配 40关 × 20词
+// ============================================================
+const WORD_POOLS = {
+  General: [
+    {w:'abandon',c:'放弃'},{w:'benefit',c:'利益'},{w:'challenge',c:'挑战'},{w:'demonstrate',c:'展示'},{w:'establish',c:'建立'},
+    {w:'significant',c:'重要的'},{w:'acquire',c:'获得'},{w:'complex',c:'复杂的'},{w:'emerge',c:'出现'},{w:'generate',c:'产生'},
+    {w:'obvious',c:'明显的'},{w:'approach',c:'方法'},{w:'area',c:'区域'},{w:'assessment',c:'评估'},{w:'assume',c:'假设'},
+    {w:'available',c:'可用的'},{w:'bond',c:'纽带'},{w:'brief',c:'简短的'},{w:'capable',c:'有能力的'},{w:'cause',c:'原因'},
+    {w:'circumstance',c:'环境'},{w:'community',c:'社区'},{w:'concentrate',c:'集中'},{w:'conduct',c:'行为'},{w:'consequence',c:'后果'},
+    {w:'construct',c:'建造'},{w:'context',c:'背景'},{w:'contract',c:'合同'},{w:'contribute',c:'贡献'},{w:'convey',c:'传达'},
+    {w:'create',c:'创造'},{w:'data',c:'数据'},{w:'define',c:'定义'},{w:'derive',c:'获得'},{w:'distribute',c:'分配'},
+    {w:'economic',c:'经济的'},{w:'environment',c:'环境'},{w:'estimate',c:'估计'},{w:'evident',c:'明显的'},{w:'expand',c:'扩展'},
+    {w:'expose',c:'暴露'},{w:'factor',c:'因素'},{w:'finance',c:'财务'},{w:'function',c:'功能'},{w:'identify',c:'识别'},
+    {w:'illustrate',c:'说明'},{w:'indicate',c:'表明'},{w:'individual',c:'个人'},{w:'interpret',c:'解释'},{w:'involve',c:'涉及'},
+    {w:'issue',c:'问题'},{w:'labor',c:'劳动力'},{w:'legal',c:'合法的'},{w:'legislation',c:'立法'},{w:'major',c:'主要的'},
+    {w:'method',c:'方法'},{w:'occur',c:'发生'},{w:'percent',c:'百分比'},{w:'period',c:'时期'},{w:'policy',c:'政策'},
+    {w:'principle',c:'原则'},{w:'procedure',c:'程序'},{w:'process',c:'过程'},{w:'produce',c:'生产'},{w:'profit',c:'利润'},
+    {w:'range',c:'范围'},{w:'region',c:'地区'},{w:'regulate',c:'调节'},{w:'relevant',c:'相关的'},{w:'resident',c:'居民'},
+    {w:'resource',c:'资源'},{w:'restrict',c:'限制'},{w:'secure',c:'安全的'},{w:'select',c:'选择'},{w:'site',c:'地点'},
+    {w:'source',c:'来源'},{w:'specific',c:'具体的'},{w:'strategy',c:'策略'},{w:'structure',c:'结构'},{w:'theory',c:'理论'},
+    {w:'transfer',c:'转移'},{w:'vary',c:'变化'},{w:'whereas',c:'然而'},{w:'widespread',c:'广泛的'},{w:'abstract',c:'抽象的'},
+    {w:'acknowledge',c:'承认'},{w:'advocate',c:'提倡'},{w:'allocate',c:'分配'},{w:'anticipate',c:'预期'},{w:'assure',c:'确保'},
+    {w:'attain',c:'达到'},{w:'attitude',c:'态度'},{w:'attribute',c:'归因'},{w:'authority',c:'权威'},{w:'automate',c:'自动化'},
+    {w:'balance',c:'平衡'},{w:'barrier',c:'障碍'},{w:'behavior',c:'行为'},{w:'belief',c:'信念'},{w:'boost',c:'推动'},
+    {w:'budget',c:'预算'},{w:'capacity',c:'能力'}
+  ],
+  Environment: [
+    {w:'ecosystem',c:'生态系统'},{w:'biodiversity',c:'生物多样性'},{w:'erosion',c:'侵蚀'},{w:'sediment',c:'沉积物'},{w:'sustainable',c:'可持续的'},
+    {w:'renewable',c:'可再生的'},{w:'pollutant',c:'污染物'},{w:'conservation',c:'保护'},{w:'climate',c:'气候'},{w:'precipitation',c:'降水'},
+    {w:'evaporation',c:'蒸发'},{w:'deforestation',c:'森林砍伐'},{w:'fossil',c:'化石'},{w:'emission',c:'排放'},{w:'ozone',c:'臭氧'},
+    {w:'greenhouse',c:'温室'},{w:'habitat',c:'栖息地'},{w:'wildlife',c:'野生动物'},{w:'extinction',c:'灭绝'},{w:'endangered',c:'濒危的'},
+    {w:'recycle',c:'回收'},{w:'waste',c:'废物'},{w:'contamination',c:'污染'},{w:'purification',c:'净化'},{w:'agriculture',c:'农业'},
+    {w:'irrigation',c:'灌溉'},{w:'cultivation',c:'耕作'},{w:'fertilizer',c:'肥料'},{w:'pesticide',c:'杀虫剂'},{w:'organic',c:'有机的'},
+    {w:'biome',c:'生物群落'},{w:'fauna',c:'动物群'},{w:'flora',c:'植物群'},{w:'migration',c:'迁徙'},{w:'hibernation',c:'冬眠'},
+    {w:'adaptation',c:'适应'},{w:'survival',c:'生存'},{w:'coral',c:'珊瑚'},{w:'reef',c:'礁石'},{w:'mangrove',c:'红树林'},
+    {w:'wetland',c:'湿地'},{w:'grassland',c:'草原'},{w:'forest',c:'森林'},{w:'jungle',c:'丛林'},{w:'tropical',c:'热带的'},
+    {w:'temperate',c:'温带的'},{w:'marine',c:'海洋的'},{w:'aquatic',c:'水生的'},{w:'terrestrial',c:'陆地的'},{w:'aerial',c:'空中的'},
+    {w:'canopy',c:'树冠'},{w:'understory',c:'下层植被'},{w:'soil',c:'土壤'},{w:'moisture',c:'湿度'},{w:'drought',c:'干旱'},
+    {w:'flood',c:'洪水'},{w:'storm',c:'风暴'},{w:'hurricane',c:'飓风'},{w:'tornado',c:'龙卷风'},{w:'glacier',c:'冰川'},
+    {w:'polar',c:'极地的'},{w:'equatorial',c:'赤道的'},{w:'desert',c:'沙漠'},{w:'savanna',c:'热带草原'},{w:'tundra',c:'冻原'},
+    {w:'permafrost',c:'永久冻土'},{w:'ecology',c:'生态学'},{w:'organism',c:'有机体'},{w:'photosynthesis',c:'光合作用'},{w:'respiration',c:'呼吸'},
+    {w:'decomposition',c:'分解'},{w:'nutrient',c:'营养物'},{w:'cycle',c:'循环'},{w:'food chain',c:'食物链'},{w:'predator',c:'捕食者'},
+    {w:'prey',c:'猎物'},{w:'symbiotic',c:'共生的'},{w:'parasite',c:'寄生虫'},{w:'bacteria',c:'细菌'},{w:'fungus',c:'真菌'},
+    {w:'virus',c:'病毒'},{w:'immunity',c:'免疫力'},{w:'vaccine',c:'疫苗'},{w:'toxic',c:'有毒的'},{w:'hazardous',c:'危险的'},
+    {w:'disposal',c:'处理'},{w:'landfill',c:'垃圾填埋场'},{w:'incineration',c:'焚烧'},{w:'renewable energy',c:'可再生能源'},{w:'solar',c:'太阳能的'},
+    {w:'wind',c:'风能的'},{w:'hydroelectric',c:'水力的'},{w:'geothermal',c:'地热的'},{w:'biomass',c:'生物质'},{w:'carbon footprint',c:'碳足迹'},
+    {w:'sustainability',c:'可持续性'}
+  ],
+  Biology: [
+    {w:'cell',c:'细胞'},{w:'organism',c:'生物'},{w:'evolution',c:'进化'},{w:'species',c:'物种'},{w:'gene',c:'基因'},
+    {w:'chromosome',c:'染色体'},{w:'metabolism',c:'新陈代谢'},{w:'protein',c:'蛋白质'},{w:'enzyme',c:'酶'},{w:'hormone',c:'激素'},
+    {w:'neuron',c:'神经元'},{w:'tissue',c:'组织'},{w:'organ',c:'器官'},{w:'system',c:'系统'},{w:'reproduction',c:'繁殖'},
+    {w:'offspring',c:'后代'},{w:'hereditary',c:'遗传的'},{w:'mutation',c:'突变'},{w:'variation',c:'变异'},{w:'selection',c:'选择'},
+    {w:'adaptation',c:'适应'},{w:'ecology',c:'生态学'},{w:'population',c:'种群'},{w:'community',c:'群落'},{w:'niche',c:'生态位'},
+    {w:'herbivore',c:'食草动物'},{w:'carnivore',c:'食肉动物'},{w:'omnivore',c:'杂食动物'},{w:'scavenger',c:'食腐动物'},{w:'decomposer',c:'分解者'},
+    {w:'symbiosis',c:'共生'},{w:'mutualism',c:'互利共生'},{w:'commensalism',c:'共生'},{w:'parasitism',c:'寄生'},{w:'biological',c:'生物的'},
+    {w:'molecular',c:'分子的'},{w:'biochemical',c:'生物化学的'},{w:'genome',c:'基因组'},{w:'phenotype',c:'表型'},{w:'genotype',c:'基因型'},
+    {w:'meiosis',c:'减数分裂'},{w:'mitosis',c:'有丝分裂'},{w:'fertilization',c:'受精'},{w:'embryo',c:'胚胎'},{w:'fetus',c:'胎儿'},
+    {w:'gestation',c:'妊娠'},{w:'digestion',c:'消化'},{w:'circulation',c:'循环'},{w:'respiration',c:'呼吸'},{w:'excretion',c:'排泄'},
+    {w:'regulation',c:'调节'},{w:'stimulus',c:'刺激'},{w:'response',c:'反应'},{w:'nervous',c:'神经的'},{w:'endocrine',c:'内分泌的'},
+    {w:'immune',c:'免疫的'},{w:'lymphatic',c:'淋巴的'},{w:'skeletal',c:'骨骼的'},{w:'muscular',c:'肌肉的'},{w:'epidermal',c:'表皮的'},
+    {w:'vascular',c:'维管的'},{w:'reproductive',c:'生殖的'},{w:'developmental',c:'发育的'},{w:'behavioral',c:'行为的'},{w:'cognitive',c:'认知的'},
+    {w:'cellular',c:'细胞的'},{w:'microscopic',c:'微观的'},{w:'macroscopic',c:'宏观的'},{w:'aerobic',c:'有氧的'},{w:'anaerobic',c:'厌氧的'},
+    {w:'photosynthesis',c:'光合作用'},{w:'chlorophyll',c:'叶绿素'},{w:'organelle',c:'细胞器'},{w:'cytoplasm',c:'细胞质'},{w:'nucleus',c:'细胞核'},
+    {w:'membrane',c:'膜'},{w:'wall',c:'壁'},{w:'flagella',c:'鞭毛'},{w:'cilia',c:'纤毛'},{w:'microscope',c:'显微镜'},
+    {w:'laboratory',c:'实验室'},{w:'experiment',c:'实验'},{w:'hypothesis',c:'假设'},{w:'observation',c:'观察'},{w:'classification',c:'分类'},
+    {w:'phylogeny',c:'系统发育'},{w:'taxonomy',c:'分类学'},{w:'biodiversity',c:'生物多样性'},{w:'conservation',c:'保护'}
+  ],
+  Geology: [
+    {w:'geology',c:'地质学'},{w:'magma',c:'岩浆'},{w:'volcano',c:'火山'},{w:'earthquake',c:'地震'},{w:'crust',c:'地壳'},
+    {w:'mantle',c:'地幔'},{w:'core',c:'地核'},{w:'erosion',c:'侵蚀'},{w:'deposition',c:'沉积'},{w:'plateau',c:'高原'},
+    {w:'canyon',c:'峡谷'},{w:'glacier',c:'冰川'},{w:'fossil',c:'化石'},{w:'mineral',c:'矿物'},{w:'rock',c:'岩石'},
+    {w:'sediment',c:'沉积物'},{w:'tectonic',c:'构造的'},{w:'fault',c:'断层'},{w:'fold',c:'褶皱'},{w:'continent',c:'大陆'},
+    {w:'ocean',c:'海洋'},{w:'island',c:'岛屿'},{w:'peninsula',c:'半岛'},{w:'cape',c:'海角'},{w:'gulf',c:'海湾'},
+    {w:'strait',c:'海峡'},{w:'current',c:'洋流'},{w:'tide',c:'潮汐'},{w:'wave',c:'波浪'},{w:'tsunami',c:'海啸'},
+    {w:'hurricane',c:'飓风'},{w:'cyclone',c:'气旋'},{w:'tornado',c:'龙卷风'},{w:'drought',c:'干旱'},{w:'flood',c:'洪水'},
+    {w:'atmosphere',c:'大气'},{w:'stratosphere',c:'平流层'},{w:'troposphere',c:'对流层'},{w:'ozone',c:'臭氧'},{w:'radiation',c:'辐射'},
+    {w:'solar',c:'太阳的'},{w:'lunar',c:'月球的'},{w:'orbit',c:'轨道'},{w:'eclipse',c:'日食'},{w:'comet',c:'彗星'},
+    {w:'asteroid',c:'小行星'},{w:'meteor',c:'流星'},{w:'planet',c:'行星'},{w:'star',c:'恒星'},{w:'galaxy',c:'银河'},
+    {w:'universe',c:'宇宙'},{w:'telescope',c:'望远镜'},{w:'observatory',c:'天文台'},{w:'satellite',c:'卫星'},{w:'gravity',c:'重力'},
+    {w:'mass',c:'质量'},{w:'density',c:'密度'},{w:'pressure',c:'压力'},{w:'temperature',c:'温度'},{w:'climate',c:'气候'},
+    {w:'weather',c:'天气'},{w:'monsoon',c:'季风'},{w:'el nino',c:'厄尔尼诺'},{w:'la nina',c:'拉尼娜'},{w:'sedimentology',c:'沉积学'},
+    {w:'stratigraphy',c:'地层学'},{w:'paleontology',c:'古生物学'},{w:'archaeology',c:'考古学'},{w:'mineralogy',c:'矿物学'},{w:'seismology',c:'地震学'},
+    {w:'volcanology',c:'火山学'},{w:'hydrology',c:'水文学'},{w:'oceanography',c:'海洋学'},{w:'meteorology',c:'气象学'},{w:'astronomy',c:'天文学'},
+    {w:'astrophysics',c:'天体物理学'},{w:'cosmology',c:'宇宙学'},{w:'tectonic plate',c:'构造板块'},{w:'continental drift',c:'大陆漂移'},{w:'subduction',c:'俯冲'},
+    {w:'rift',c:'裂谷'},{w:'magma chamber',c:'岩浆房'},{w:'lava',c:'熔岩'},{w:'ash',c:'火山灰'},{w:'pumice',c:'浮石'},
+    {w:'granite',c:'花岗岩'},{w:'limestone',c:'石灰岩'},{w:'sandstone',c:'砂岩'}
+  ],
+  History: [
+    {w:'archaeology',c:'考古学'},{w:'artifact',c:'手工艺品'},{w:'civilization',c:'文明'},{w:'dynasty',c:'王朝'},{w:'empire',c:'帝国'},
+    {w:'excavation',c:'发掘'},{w:'fossil',c:'化石'},{w:'relic',c:'遗迹'},{w:'culture',c:'文化'},{w:'tradition',c:'传统'},
+    {w:'heritage',c:'遗产'},{w:'monument',c:'纪念碑'},{w:'temple',c:'寺庙'},{w:'pyramid',c:'金字塔'},{w:'tomb',c:'陵墓'},
+    {w:'pottery',c:'陶器'},{w:'sculpture',c:'雕塑'},{w:'painting',c:'绘画'},{w:'literature',c:'文学'},{w:'philosophy',c:'哲学'},
+    {w:'religion',c:'宗教'},{w:'ritual',c:'仪式'},{w:'mythology',c:'神话'},{w:'legend',c:'传说'},{w:'ancestor',c:'祖先'},
+    {w:'tribe',c:'部落'},{w:'clan',c:'氏族'},{w:'community',c:'社区'},{w:'settlement',c:'定居点'},{w:'migration',c:'迁徙'},
+    {w:'invasion',c:'入侵'},{w:'conquest',c:'征服'},{w:'revolution',c:'革命'},{w:'reform',c:'改革'},{w:'movement',c:'运动'},
+    {w:'ideology',c:'意识形态'},{w:'doctrine',c:'学说'},{w:'regime',c:'政权'},{w:'governance',c:'治理'},{w:'administration',c:'行政'},
+    {w:'bureaucracy',c:'官僚主义'},{w:'aristocracy',c:'贵族'},{w:'democracy',c:'民主'},{w:'republic',c:'共和国'},{w:'constitution',c:'宪法'},
+    {w:'legislation',c:'立法'},{w:'judiciary',c:'司法'},{w:'executive',c:'行政的'},{w:'diplomacy',c:'外交'},{w:'treaty',c:'条约'},
+    {w:'alliance',c:'联盟'},{w:'warfare',c:'战争'},{w:'weapon',c:'武器'},{w:'armor',c:'盔甲'},{w:'castle',c:'城堡'},
+    {w:'fortress',c:'堡垒'},{w:'city-state',c:'城邦'},{w:'colony',c:'殖民地'},{w:'colonization',c:'殖民'},{w:'independence',c:'独立'},
+    {w:'sovereignty',c:'主权'},{w:'territory',c:'领土'},{w:'border',c:'边界'},{w:'trade',c:'贸易'},{w:'commerce',c:'商业'},
+    {w:'market',c:'市场'},{w:'currency',c:'货币'},{w:'tax',c:'税收'},{w:'agriculture',c:'农业'},{w:'industry',c:'工业'},
+    {w:'technology',c:'技术'},{w:'invention',c:'发明'},{w:'innovation',c:'创新'},{w:'renaissance',c:'文艺复兴'},{w:'enlightenment',c:'启蒙'},
+    {w:'industrial revolution',c:'工业革命'},{w:'feudalism',c:'封建主义'},{w:'slavery',c:'奴隶制'},{w:'caste',c:'种姓'},{w:'class',c:'阶级'},
+    {w:'urban',c:'城市的'},{w:'rural',c:'乡村的'},{w:'demographic',c:'人口的'},{w:'census',c:'人口普查'},{w:'genealogy',c:'家谱'},
+    {w:'linguistics',c:'语言学'},{w:'ethnography',c:'民族志'},{w:'anthropology',c:'人类学'},{w:'sociology',c:'社会学'},{w:'psychology',c:'心理学'},
+    {w:'manuscript',c:'手稿'},{w:'scripture',c:'经文'},{w:'papyrus',c:'纸莎草'},{w:'parchment',c:'羊皮纸'}
+  ],
+  Business: [
+    {w:'economy',c:'经济'},{w:'market',c:'市场'},{w:'finance',c:'金融'},{w:'investment',c:'投资'},{w:'profit',c:'利润'},
+    {w:'revenue',c:'收入'},{w:'expenditure',c:'支出'},{w:'deficit',c:'赤字'},{w:'surplus',c:'盈余'},{w:'inflation',c:'通货膨胀'},
+    {w:'deflation',c:'通货紧缩'},{w:'asset',c:'资产'},{w:'liability',c:'负债'},{w:'equity',c:'股权'},{w:'stock',c:'股票'},
+    {w:'bond',c:'债券'},{w:'commodity',c:'商品'},{w:'currency',c:'货币'},{w:'exchange',c:'交换'},{w:'trade',c:'贸易'},
+    {w:'tariff',c:'关税'},{w:'quota',c:'配额'},{w:'subsidy',c:'补贴'},{w:'tax',c:'税收'},{w:'budget',c:'预算'},
+    {w:'accounting',c:'会计'},{w:'audit',c:'审计'},{w:'management',c:'管理'},{w:'leadership',c:'领导力'},{w:'strategy',c:'战略'},
+    {w:'marketing',c:'市场营销'},{w:'branding',c:'品牌'},{w:'consumer',c:'消费者'},{w:'retail',c:'零售'},{w:'wholesale',c:'批发'},
+    {w:'logistics',c:'物流'},{w:'supply chain',c:'供应链'},{w:'production',c:'生产'},{w:'manufacturing',c:'制造业'},{w:'service',c:'服务'},
+    {w:'sector',c:'部门'},{w:'industry',c:'行业'},{w:'corporation',c:'公司'},{w:'enterprise',c:'企业'},{w:'entrepreneurship',c:'创业'},
+    {w:'innovation',c:'创新'},{w:'competition',c:'竞争'},{w:'monopoly',c:'垄断'},{w:'merger',c:'合并'},{w:'acquisition',c:'收购'},
+    {w:'shareholder',c:'股东'},{w:'stakeholder',c:'利益相关者'},{w:'consultant',c:'顾问'},{w:'analyst',c:'分析师'},{w:'trend',c:'趋势'},
+    {w:'forecast',c:'预测'},{w:'fluctuation',c:'波动'},{w:'crisis',c:'危机'},{w:'recession',c:'衰退'},{w:'recovery',c:'复苏'},
+    {w:'growth',c:'增长'},{w:'development',c:'发展'},{w:'globalization',c:'全球化'},{w:'outsourcing',c:'外包'},{w:'efficiency',c:'效率'},
+    {w:'productivity',c:'生产力'},{w:'quality',c:'质量'},{w:'standard',c:'标准'},{w:'negotiation',c:'谈判'},{w:'contract',c:'合同'},
+    {w:'agreement',c:'协议'},{w:'policy',c:'政策'},{w:'regulation',c:'监管'},{w:'compliance',c:'合规'},{w:'risk',c:'风险'},
+    {w:'security',c:'安全'},{w:'insurance',c:'保险'},{w:'pension',c:'养老金'},{w:'fund',c:'基金'},{w:'capital',c:'资本'},
+    {w:'interest',c:'利息'},{w:'dividend',c:'股息'},{w:'portfolio',c:'投资组合'},{w:'index',c:'指数'},{w:'salary',c:'薪水'},
+    {w:'wage',c:'工资'},{w:'employment',c:'就业'},{w:'unemployment',c:'失业'},{w:'labor',c:'劳动力'},{w:'union',c:'工会'},
+    {w:'benefit',c:'福利'},{w:'incentive',c:'激励'},{w:'bonus',c:'奖金'},{w:'commission',c:'佣金'},{w:'depreciation',c:'折旧'},
+    {w:'liquidity',c:'流动性'},{w:'solvency',c:'偿付能力'},{w:'bankruptcy',c:'破产'}
+  ],
+  Psychology: [
+    {w:'psychology',c:'心理学'},{w:'sociology',c:'社会学'},{w:'education',c:'教育'},{w:'behavior',c:'行为'},{w:'cognition',c:'认知'},
+    {w:'perception',c:'知觉'},{w:'emotion',c:'情感'},{w:'personality',c:'人格'},{w:'attitude',c:'态度'},{w:'belief',c:'信念'},
+    {w:'value',c:'价值观'},{w:'norm',c:'规范'},{w:'culture',c:'文化'},{w:'society',c:'社会'},{w:'group',c:'群体'},
+    {w:'individual',c:'个人'},{w:'identity',c:'身份'},{w:'role',c:'角色'},{w:'status',c:'地位'},{w:'class',c:'阶级'},
+    {w:'race',c:'种族'},{w:'gender',c:'性别'},{w:'age',c:'年龄'},{w:'intelligence',c:'智力'},{w:'memory',c:'记忆'},
+    {w:'learning',c:'学习'},{w:'motivation',c:'动机'},{w:'stress',c:'压力'},{w:'anxiety',c:'焦虑'},{w:'depression',c:'抑郁'},
+    {w:'therapy',c:'治疗'},{w:'counseling',c:'咨询'},{w:'development',c:'发展'},{w:'childhood',c:'童年'},{w:'adolescence',c:'青春期'},
+    {w:'adulthood',c:'成年'},{w:'aging',c:'老龄化'},{w:'health',c:'健康'},{w:'mental',c:'心理的'},{w:'physical',c:'身体的'},
+    {w:'exercise',c:'锻炼'},{w:'nutrition',c:'营养'},{w:'medicine',c:'医学'},{w:'disease',c:'疾病'},{w:'disorder',c:'障碍'},
+    {w:'syndrome',c:'综合症'},{w:'symptom',c:'症状'},{w:'treatment',c:'治疗'},{w:'prevention',c:'预防'},{w:'addiction',c:'成瘾'},
+    {w:'interaction',c:'互动'},{w:'communication',c:'交流'},{w:'language',c:'语言'},{w:'diversity',c:'多样性'},{w:'equality',c:'平等'},
+    {w:'justice',c:'正义'},{w:'freedom',c:'自由'},{w:'right',c:'权利'},{w:'responsibility',c:'责任'},{w:'morality',c:'道德'},
+    {w:'ethics',c:'伦理'},{w:'logic',c:'逻辑'},{w:'reasoning',c:'推理'},{w:'creativity',c:'创造力'},{w:'imagination',c:'想象力'},
+    {w:'curiosity',c:'好奇心'},{w:'attention',c:'注意力'},{w:'consciousness',c:'意识'},{w:'subconscious',c:'潜意识的'},{w:'dream',c:'梦想'},
+    {w:'instinct',c:'本能'},{w:'impulse',c:'冲动'},{w:'empathy',c:'同理心'},{w:'sympathy',c:'同情'},{w:'love',c:'爱'},
+    {w:'friendship',c:'友谊'},{w:'family',c:'家庭'},{w:'marriage',c:'婚姻'},{w:'parenting',c:'养育'},{w:'leadership',c:'领导力'},
+    {w:'teamwork',c:'团队合作'},{w:'conflict',c:'冲突'},{w:'compromise',c:'妥协'},{w:'cooperation',c:'合作'},{w:'competition',c:'竞争'},
+    {w:'social',c:'社会的'},{w:'economic',c:'经济的'},{w:'political',c:'政治的'},{w:'historical',c:'历史的'},{w:'philosophical',c:'哲学的'},
+    {w:'anthropological',c:'人类学的'},{w:'linguistic',c:'语言学的'},{w:'psychological',c:'心理学的'},{w:'sociological',c:'社会学的'},{w:'pedagogical',c:'教学法的'}
+  ],
+  Advanced: [
+    {w:'analyze',c:'分析'},{w:'synthesize',c:'综合'},{w:'evaluate',c:'评估'},{w:'formulate',c:'制定'},{w:'hypothesize',c:'假设'},
+    {w:'theorize',c:'建立理论'},{w:'conceptualize',c:'概念化'},{w:'operationalize',c:'操作化'},{w:'quantify',c:'量化'},{w:'validate',c:'验证'},
+    {w:'verify',c:'核实'},{w:'justify',c:'证明合理'},{w:'critique',c:'批判'},{w:'debate',c:'辩论'},{w:'perspective',c:'视角'},
+    {w:'paradigm',c:'范例'},{w:'phenomenon',c:'现象'},{w:'correlation',c:'相关性'},{w:'causation',c:'因果关系'},{w:'variable',c:'变量'},
+    {w:'constant',c:'常量'},{w:'hypothesis',c:'假设'},{w:'theory',c:'理论'},{w:'model',c:'模型'},{w:'framework',c:'框架'},
+    {w:'methodology',c:'方法论'},{w:'approach',c:'方法'},{w:'technique',c:'技术'},{w:'procedure',c:'程序'},{w:'protocol',c:'协议'},
+    {w:'accuracy',c:'准确性'},{w:'precision',c:'精确性'},{w:'reliability',c:'可靠性'},{w:'validity',c:'有效性'},{w:'significance',c:'意义'},
+    {w:'relevance',c:'相关性'},{w:'consistency',c:'一致性'},{w:'coherence',c:'连贯性'},{w:'clarity',c:'清晰'},{w:'conciseness',c:'简洁'},
+    {w:'objectivity',c:'客观性'},{w:'subjectivity',c:'主观性'},{w:'bias',c:'偏见'},{w:'assumption',c:'假设'},{w:'implication',c:'含义'},
+    {w:'inference',c:'推理'},{w:'argument',c:'论点'},{w:'evidence',c:'证据'},{w:'data',c:'数据'},{w:'statistic',c:'统计'},
+    {w:'probability',c:'概率'},{w:'distribution',c:'分布'},{w:'ratio',c:'比率'},{w:'proportion',c:'比例'},{w:'percentage',c:'百分比'},
+    {w:'frequency',c:'频率'},{w:'duration',c:'持续时间'},{w:'intensity',c:'强度'},{w:'dimension',c:'维度'},{w:'aspect',c:'方面'},
+    {w:'factor',c:'因素'},{w:'context',c:'背景'},{w:'environment',c:'环境'},{w:'system',c:'系统'},{w:'structure',c:'结构'},
+    {w:'process',c:'过程'},{w:'cycle',c:'周期'},{w:'phase',c:'阶段'},{w:'stage',c:'阶段'},{w:'level',c:'水平'},
+    {w:'degree',c:'程度'},{w:'extent',c:'程度'},{w:'capacity',c:'能力'},{w:'ability',c:'能力'},{w:'skill',c:'技能'},
+    {w:'proficiency',c:'熟练'},{w:'competence',c:'能力'},{w:'expertise',c:'专业知识'},{w:'knowledge',c:'知识'},{w:'understanding',c:'理解'},
+    {w:'insight',c:'洞察'},{w:'wisdom',c:'智慧'},{w:'innovation',c:'创新'},{w:'creativity',c:'创造力'},{w:'adaptability',c:'适应性'},
+    {w:'flexibility',c:'灵活性'},{w:'resilience',c:'韧性'},{w:'determination',c:'决心'},{w:'persistence',c:'坚持'},{w:'integrity',c:'诚信'},
+    {w:'transparency',c:'透明度'},{w:'accountability',c:'责任'},{w:'sustainability',c:'可持续性'},{w:'scalability',c:'可扩展性'}
+  ]
+};
+
+// ============================================================
+// 2. 关卡配置 (40关, 每关20词)
+// ============================================================
+const LEVEL_THEMES = {
+  1:'General',2:'General',3:'General',4:'General',5:'General',
+  6:'Environment',7:'Environment',8:'Environment',9:'Environment',10:'Environment',
+  11:'Biology',12:'Biology',13:'Biology',14:'Biology',15:'Biology',
+  16:'Geology',17:'Geology',18:'Geology',19:'Geology',20:'Geology',
+  21:'History',22:'History',23:'History',24:'History',25:'History',
+  26:'Business',27:'Business',28:'Business',29:'Business',30:'Business',
+  31:'Psychology',32:'Psychology',33:'Psychology',34:'Psychology',35:'Psychology',
+  36:'Advanced',37:'Advanced',38:'Advanced',39:'Advanced',40:'Advanced'
+};
+
+function getLevelWords(level) {
+  const theme = LEVEL_THEMES[level];
+  const pool = WORD_POOLS[theme] || [];
+  const start = ((level - 1) % 5) * 20;
+  return pool.slice(start, start + 20);
+}
+
+// ============================================================
+// 3. 游戏数据管理
+// ============================================================
+function defaultData(username) {
+  const levels = {};
+  for (let i = 1; i <= 40; i++) {
+    levels[i] = { unlocked: (i === 1), completed: false, perfect: false, currentStage: 0, lives: 5, score: 0, wrongWords: [] };
+  }
+  return { username, totalScore: 0, totalCorrect: 0, totalWrong: 0, levels, themeStats: {} };
+}
+
+let data = null, currentLevel = 1, answering = false;
+
+function loadData(username) {
+  const raw = localStorage.getItem('vocabExpedition_' + username);
+  if (raw) {
+    try { data = JSON.parse(raw); if (!data.levels || !data.levels[1]) data = defaultData(username); }
+    catch (e) { data = defaultData(username); }
+  } else { data = defaultData(username); }
+  saveData(); return data;
+}
+function saveData() { if (data) localStorage.setItem('vocabExpedition_' + data.username, JSON.stringify(data)); }
+
+function getAllWords() {
+  let all = [];
+  for (const key in WORD_POOLS) all = all.concat(WORD_POOLS[key]);
+  return all;
+}
+
+function getDistractors(correctChinese, excludeWord) {
+  const pool = getAllWords().filter(w => w.c !== correctChinese && w.w !== excludeWord);
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 3).map(w => w.c);
+}
+
+// ============================================================
+// 4. UI 导航 & Toast
+// ============================================================
+function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function backToMenu() { showPage('page-menu'); renderMenu(); }
+function showToast(msg, dur=2000) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'), dur); }
+
+// ============================================================
+// 5. 登录
+// ============================================================
+function login() {
+  const name = document.getElementById('login-username').value.trim() || '探险家';
+  loadData(name);
+  document.getElementById('menu-username').textContent = '👤 ' + data.username;
+  renderMenu();
+  showPage('page-menu');
+  showToast('欢迎回来，' + data.username + '！');
+}
+
+// ============================================================
+// 6. 渲染主菜单 (40关网格)
+// ============================================================
+function renderMenu() {
+  if (!data) return;
+  document.getElementById('menu-username').textContent = '👤 ' + data.username;
+  document.getElementById('menu-total-score').textContent = data.totalScore;
+  document.getElementById('menu-total-correct').textContent = data.totalCorrect;
+  document.getElementById('menu-total-wrong').textContent = data.totalWrong;
+  let completedCount = 0;
+  for (let i=1; i<=40; i++) if (data.levels[i].completed) completedCount++;
+  document.getElementById('menu-progress').textContent = `${completedCount}/40`;
+
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 40; i++) {
+    const info = data.levels[i];
+    const node = document.createElement('div');
+    node.className = 'level-node';
+    if (!info.unlocked) { node.classList.add('locked'); node.innerHTML = `${i}<span class="badge">🔒</span>`; }
+    else if (info.completed) {
+      node.classList.add('completed');
+      node.innerHTML = `${i}<span class="badge">${info.perfect ? '⭐' : '✅'}</span>`;
+      node.onclick = () => startLevel(i);
+    } else {
+      node.classList.add('unlocked');
+      node.innerHTML = `${i}<span class="badge">▶</span>`;
+      node.onclick = () => startLevel(i);
+    }
+    grid.appendChild(node);
+  }
+}
+
+// ============================================================
+// 7. 游戏核心逻辑
+// ============================================================
+function startLevel(level) {
+  if (!data.levels[level].unlocked) { showToast('该关未解锁！'); return; }
+  currentLevel = level;
+  const info = data.levels[level];
+  if (info.completed) {
+    if (!confirm('已通关，是否重置本关重新挑战？')) return;
+    info.completed = false; info.perfect = false; info.currentStage = 0; info.lives = 5; info.score = 0; info.wrongWords = [];
+    saveData();
+  }
+  if (info.lives <= 0) info.lives = 5;
+  renderGame();
+  showPage('page-game');
+}
+
+function renderGame() {
+  const info = data.levels[currentLevel];
+  const words = getLevelWords(currentLevel);
+  const stage = info.currentStage;
+  document.getElementById('game-level-label').textContent = `第 ${currentLevel} 关`;
+  document.getElementById('game-stage').textContent = Math.min(stage + 1, words.length);
+  document.getElementById('game-score').textContent = info.score;
+
+  const livesDiv = document.getElementById('game-lives-display');
+  livesDiv.innerHTML = '';
+  for (let i=0; i<5; i++) { const s=document.createElement('span'); s.textContent = i < info.lives ? '❤️' : '🖤'; livesDiv.appendChild(s); }
+
+  if (stage >= words.length) { completeLevel(); return; }
+  const wordObj = words[stage];
+  if (!wordObj) { completeLevel(); return; }
+
+  document.getElementById('game-word').textContent = wordObj.w;
+  document.getElementById('game-pos-theme').textContent = `📚 ${LEVEL_THEMES[currentLevel]} · 第 ${stage+1}/20 题`;
+
+  const correct = wordObj.c;
+  const distractors = getDistractors(correct, wordObj.w);
+  const options = [correct, ...distractors].sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, idx) => {
+    btn.textContent = options[idx] || '—';
+    btn.className = 'option-btn';
+    btn.disabled = false;
+    btn.dataset.correct = (options[idx] === correct) ? 'true' : 'false';
+  });
+  document.getElementById('game-feedback').textContent = '';
+  document.getElementById('btn-next').style.display = 'none';
+  answering = false;
+}
+
+function selectOption(e) {
+  const btn = e.currentTarget;
+  if (answering || btn.disabled) return;
+  answering = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  const info = data.levels[currentLevel];
+  const words = getLevelWords(currentLevel);
+  const stage = info.currentStage;
+  const wordObj = words[stage];
+
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    info.score += 10; data.totalScore += 10; data.totalCorrect += 1;
+    document.getElementById('game-feedback').textContent = '✅ 正确！ +10分';
+    updateThemeStats(LEVEL_THEMES[currentLevel], true);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option-btn').forEach(b => { if (b.dataset.correct === 'true') b.classList.add('correct'); });
+    info.lives -= 1; data.totalWrong += 1;
+    info.wrongWords.push({ word: wordObj.w, chinese: wordObj.c, theme: LEVEL_THEMES[currentLevel] });
+    document.getElementById('game-feedback').textContent = `❌ 错误！ 正确答案: “${wordObj.c}”`;
+    updateThemeStats(LEVEL_THEMES[currentLevel], false);
+  }
+  document.getElementById('game-score').textContent = info.score;
+
+  if (info.lives <= 0) {
+    document.getElementById('game-feedback').textContent += ' 💀 生命耗尽！';
+    document.getElementById('btn-next').style.display = 'none';
+    const p = document.getElementById('game-feedback').parentNode;
+    let retry = p.querySelector('.retry-btn');
+    if (!retry) { retry = document.createElement('button'); retry.className = 'btn btn-danger retry-btn'; retry.textContent = '🔁 重试本关'; retry.onclick = ()=>{ resetLevel(currentLevel); startLevel(currentLevel); }; p.appendChild(retry); }
+    saveData(); return;
+  }
+
+  if (stage + 1 >= words.length) {
+    document.getElementById('btn-next').style.display = 'none';
+    setTimeout(() => completeLevel(), 700);
+  } else {
+    document.getElementById('btn-next').style.display = 'inline-block';
+  }
+  saveData();
+}
+
+function nextQuestion() {
+  const info = data.levels[currentLevel];
+  info.currentStage += 1;
+  saveData();
+  renderGame();
+}
+
+function completeLevel() {
+  const info = data.levels[currentLevel];
+  if (info.completed) return;
+  info.completed = true;
+  info.perfect = (info.lives === 5 && info.wrongWords.length === 0);
+  if (currentLevel < 40) data.levels[currentLevel + 1].unlocked = true;
+  saveData();
+  showToast(`🎉 第 ${currentLevel} 关通关！${info.perfect ? ' ⭐完美！' : ''}`, 2500);
+  document.getElementById('game-feedback').textContent = `🎉 通关！ ${info.perfect ? '⭐完美评价！' : ''}`;
+  document.getElementById('btn-next').style.display = 'none';
+  const p = document.getElementById('game-feedback').parentNode;
+  let backBtn = p.querySelector('.back-btn');
+  if (!backBtn) { backBtn = document.createElement('button'); backBtn.className = 'btn btn-primary back-btn'; backBtn.textContent = '🏠 返回菜单'; backBtn.onclick = backToMenu; p.appendChild(backBtn); }
+  renderMenu();
+}
+
+// ============================================================
+// 8. 主题统计 & 错题本
+// ============================================================
+function updateThemeStats(theme, correct) {
+  if (!data.themeStats[theme]) data.themeStats[theme] = { correct: 0, total: 0 };
+  data.themeStats[theme].total += 1;
+  if (correct) data.themeStats[theme].correct += 1;
+  saveData();
+}
+
+function showThemeStats() {
+  const c = document.getElementById('theme-stats-container');
+  c.innerHTML = '';
+  const stats = data.themeStats;
+  const keys = Object.keys(stats);
+  if (keys.length === 0) { c.innerHTML = '<p class="text-muted">暂无数据</p>'; }
+  else {
+    keys.forEach(k => {
+      const s = stats[k]; const pct = s.total>0 ? Math.round((s.correct/s.total)*100) : 0;
+      const div = document.createElement('div'); div.style.cssText = 'display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;';
+      div.innerHTML = `<span><span class="theme-badge">${k}</span></span><span>${s.correct}/${s.total} (${pct}%)</span>`;
+      c.appendChild(div);
+    });
+  }
+  showPage('page-theme');
+}
+
+function showWrongBook() {
+  const c = document.getElementById('wrong-list-container');
+  c.innerHTML = '';
+  let all = [];
+  for (let i=1; i<=40; i++) {
+    (data.levels[i].wrongWords || []).forEach(w => all.push({...w, level:i}));
+  }
+  if (all.length === 0) { c.innerHTML = '<p class="text-muted">暂无错题</p>'; }
+  else {
+    all.forEach(w => {
+      const div = document.createElement('div'); div.className = 'wrong-item';
+      div.innerHTML = `<span><strong>${w.word}</strong> — ${w.chinese}</span><span class="theme-badge">Lv.${w.level} · ${w.theme}</span>`;
+      c.appendChild(div);
+    });
+  }
+  showPage('page-wrongbook');
+}
+
+// ============================================================
+// 9. 重置功能
+// ============================================================
+function resetLevel(level) {
+  if (!confirm(`重置第 ${level} 关进度？`)) return;
+  const info = data.levels[level];
+  info.completed = false; info.perfect = false; info.currentStage = 0; info.lives = 5; info.score = 0; info.wrongWords = [];
+  saveData(); renderMenu(); showToast('已重置');
+}
+function resetAll() {
+  if (!confirm('⚠️ 重置全部数据？不可撤销！')) return;
+  const name = data.username;
+  localStorage.removeItem('vocabExpedition_' + name);
+  loadData(name);
+  renderMenu();
+  showToast('已重置全部');
+}
+function exitGame() {
+  if (confirm('退出游戏？进度已保存。')) backToMenu();
+}
+
+// ============================================================
+// 10. 初始化
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.option-btn').forEach(b => b.addEventListener('click', selectOption));
+  document.getElementById('login-username').addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
+});
+window.login = login; window.startLevel = startLevel; window.renderMenu = renderMenu; window.backToMenu = backToMenu;
+window.showWrongBook = showWrongBook; window.showThemeStats = showThemeStats; window.resetLevel = resetLevel; window.resetAll = resetAll;
+window.exitGame = exitGame; window.nextQuestion = nextQuestion; window.selectOption = selectOption;
+</script>
+</body>
+</html>
