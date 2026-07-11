@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阅读深潜 · 学术语境词汇</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: linear-gradient(145deg, #f0f9ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .container {
+            max-width: 780px;
+            width: 100%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            box-shadow: 0 30px 60px -20px rgba(14, 116, 144, 0.25);
+            padding: 28px 24px;
+            border: 1px solid rgba(255,255,255,0.7);
+            max-height: 98vh;
+            overflow-y: auto;
+        }
+        h1 { font-size: 2rem; font-weight: 700; color: #0c4a6e; display: flex; align-items: center; gap: 10px; }
+        h1 small { font-size: 0.8rem; font-weight: 400; color: #0284c7; margin-left: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            margin-bottom: 18px;
+            border: 1px solid #f1f5f9;
+        }
+        .btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid transparent;
+        }
+        .btn-primary { background: #0284c7; color: white; }
+        .btn-primary:hover { background: #0369a1; transform: scale(0.97); }
+        .btn-success { background: #22c55e; color: white; }
+        .btn-success:hover { background: #16a34a; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-outline { background: transparent; border: 2px solid #cbd5e1; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .grid-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(62px, 1fr));
+            gap: 10px;
+            margin: 12px 0;
+        }
+        .level-node {
+            aspect-ratio: 1;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: #e2e8f0;
+            color: #94a3b8;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: default;
+            padding: 4px;
+            text-align: center;
+        }
+        .level-node.unlocked { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; cursor: pointer; }
+        .level-node.unlocked:hover { transform: scale(1.05); background: #bae6fd; }
+        .level-node.completed { background: #bbf7d0; color: #166534; border-color: #86efac; cursor: pointer; }
+        .level-node.completed:hover { transform: scale(1.05); }
+        .level-node.locked { opacity: 0.5; }
+        .level-node .badge { font-size: 0.6rem; font-weight: 400; background: rgba(0,0,0,0.05); padding: 0 6px; border-radius: 30px; margin-top: 2px; }
+        .level-node .star { color: #f59e0b; }
+        .word-display { font-size: 2.8rem; font-weight: 700; color: #0c4a6e; letter-spacing: -0.5px; margin-bottom: 2px; }
+        .pos-theme { color: #64748b; font-size: 0.9rem; margin-bottom: 14px; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px 12px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+        }
+        .option-btn:hover:not(:disabled) { background: #e2e8f0; transform: scale(0.97); }
+        .option-btn.correct { background: #bbf7d0; border-color: #22c55e; }
+        .option-btn.wrong { background: #fecaca; border-color: #ef4444; }
+        .option-btn:disabled { cursor: default; opacity: 0.6; }
+        .stats-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-weight: 500; color: #334155; }
+        .lives { display: flex; gap: 2px; align-items: center; font-size: 1.2rem; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
+        .text-center { text-align: center; }
+        .text-muted { color: #94a3b8; }
+        .wrong-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        .theme-badge { background: #e0f2fe; color: #0369a1; border-radius: 30px; padding: 2px 12px; font-size: 0.7rem; font-weight: 600; }
+        .toast { background: #0c4a6e; color: white; padding: 12px 28px; border-radius: 60px; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); font-weight: 500; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: none; z-index: 999; white-space: nowrap; }
+        .toast.show { display: block; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        .scroll-levels { max-height: 280px; overflow-y: auto; padding-right: 4px; }
+        @media (max-width: 500px) { .options { grid-template-columns: 1fr; } .grid-levels { grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); } }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- 登录 -->
+    <div id="page-login" class="page active">
+        <div class="text-center" style="padding: 30px 0 10px;">
+            <h1 style="justify-content:center;">📖 阅读深潜</h1>
+            <p style="color: #0284c7; margin: 6px 0 24px; font-weight:500;">40关 · 800学术语境词 · 读懂一切</p>
+            <div class="card" style="max-width: 360px; margin: 0 auto;">
+                <label style="font-weight:600;">账号 (任意昵称)</label>
+                <input id="login-username" type="text" placeholder="输入你的名字" value="深度读者"
+                       style="width:100%; padding:14px 16px; border-radius:40px; border:2px solid #e2e8f0; margin:10px 0 18px; font-size:1rem;" />
+                <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="login()">🚀 开始深潜</button>
+                <p style="font-size:0.7rem; color:#94a3b8; margin-top:12px;">数据自动保存在本地</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主菜单 -->
+    <div id="page-menu" class="page">
+        <div class="flex-between">
+            <h1>📖 深潜 <small id="menu-username"></small></h1>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="showWrongBook()">📕 错题</button>
+                <button class="btn btn-outline" onclick="showThemeStats()">📊 主题</button>
+                <button class="btn btn-outline" onclick="resetAll()" style="color:#ef4444;">🔄 重置</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stats-bar">
+                <span>🏆 总分: <strong id="menu-total-score">0</strong></span>
+                <span>✅ 正确: <strong id="menu-total-correct">0</strong></span>
+                <span>❌ 错误: <strong id="menu-total-wrong">0</strong></span>
+                <span>📌 进度: <strong id="menu-progress">0/40</strong></span>
+            </div>
+        </div>
+        <div class="card" style="padding:12px;">
+            <div style="font-weight:600; margin-bottom:8px; font-size:0.9rem; color:#475569;">🗺️ 点击关卡挑战 (绿=通关, 蓝=可战)</div>
+            <div class="scroll-levels">
+                <div class="grid-levels" id="level-grid"></div>
+            </div>
+        </div>
+        <div class="text-center mt-2 text-muted" style="font-size:0.8rem;">每关20词 · 5条命 · 专攻阅读语境词</div>
+    </div>
+
+    <!-- 游戏界面 -->
+    <div id="page-game" class="page">
+        <div class="flex-between">
+            <span><span id="game-level-label">第 1 关</span> · <span id="game-stage">1</span>/20</span>
+            <span class="lives" id="game-lives-display"></span>
+            <span>💯 <span id="game-score">0</span></span>
+        </div>
+        <div class="card" style="margin-top:8px;">
+            <div class="word-display" id="game-word">—</div>
+            <div class="pos-theme" id="game-pos-theme">📚 主题 · 逻辑过渡</div>
+            <div class="options" id="game-options">
+                <button class="option-btn" data-index="0">-</button>
+                <button class="option-btn" data-index="1">-</button>
+                <button class="option-btn" data-index="2">-</button>
+                <button class="option-btn" data-index="3">-</button>
+            </div>
+            <div id="game-feedback" style="margin-top:14px; font-weight:500; text-align:center; min-height:28px;"></div>
+            <div style="margin-top:12px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button class="btn btn-outline" onclick="exitGame()">🚪 退出</button>
+                <button class="btn btn-outline" id="btn-next" style="display:none;" onclick="nextQuestion()">⏩ 下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错题本 -->
+    <div id="page-wrongbook" class="page">
+        <h1>📕 错题本 · 攻克弱点</h1>
+        <div class="card" id="wrong-list-container"><p class="text-muted">暂无错题，完美！</p></div>
+        <button class="btn btn-outline" onclick="backToMenu()">⬅ 返回</button>
+    </div>
+
+    <!-- 主题统计 -->
+    <div id="page-theme" class="page">
+        <h1>📊 阅读功能掌握度</h1>
+        <div class="card" id="theme-stats-container"><p class="text-muted">暂无数据</p></div>
+        <button class="btn btn-outline" onclick="backToMenu()">⬅ 返回</button>
+    </div>
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ============================================================
+// 1. 阅读拓展专用词库 (8大功能 × 100词 = 800词)
+//    全是学术阅读/文学分析/议论文高频语境词
+// ============================================================
+const WORD_POOLS = {
+  // ---------- 1. 逻辑过渡与结构词 ----------
+  Logic: [
+    {w:'accordingly',c:'因此'},{w:'conversely',c:'相反地'},{w:'likewise',c:'同样地'},{w:'hence',c:'因此'},{w:'thus',c:'因而'},
+    {w:'therefore',c:'所以'},{w:'meanwhile',c:'与此同时'},{w:'subsequently',c:'随后'},{w:'ultimately',c:'最终'},{w:'concurrently',c:'同时地'},
+    {w:'however',c:'然而'},{w:'nevertheless',c:'尽管如此'},{w:'nonetheless',c:'不过'},{w:'although',c:'尽管'},{w:'whereas',c:'然而'},
+    {w:'while',c:'虽然'},{w:'despite',c:'尽管'},{w:'notwithstanding',c:'虽然'},{w:'furthermore',c:'此外'},{w:'moreover',c:'而且'},
+    {w:'additionally',c:'另外'},{w:'subsequently',c:'随后'},{w:'consequently',c:'因此'},{w:'as a result',c:'结果'},{w:'accordingly',c:'相应地'},
+    {w:'alternatively',c:'或者'},{w:'on the contrary',c:'恰恰相反'},{w:'in contrast',c:'相比之下'},{w:'by contrast',c:'对比而言'},{w:'on the other hand',c:'另一方面'},
+    {w:'similarly',c:'相似地'},{w:'analogously',c:'类似地'},{w:'equally',c:'平等地'},{w:'correspondingly',c:'相应地'},{w:'identically',c:'完全相同地'},
+    {w:'specifically',c:'具体而言'},{w:'in particular',c:'尤其是'},{w:'notably',w:'尤其'},{w:'especially',c:'特别地'},{w:'chiefly',c:'主要地'},
+    {w:'primarily',c:'首要地'},{w:'predominantly',c:'占主导地'},{w:'largely',c:'很大程度上'},{w:'mainly',c:'主要地'},{w:'mostly',c:'多半'},
+    {w:'generally',c:'通常'},{w:'overall',c:'总体而言'},{w:'broadly',c:'广义上'},{w:'roughly',c:'大体上'},{w:'approximately',c:'大约'},
+    {w:'exactly',c:'准确地'},{w:'precisely',c:'精确地'},{w:'accurately',c:'正确地'},{w:'strictly',c:'严格地'},{w:'literally',c:'字面上'},
+    {w:'virtually',c:'实际上'},{w:'practically',c:'几乎'},{w:'essentially',c:'本质上'},{w:'basically',c:'基本上'},{w:'fundamentally',c:'根本上'},
+    {w:'incidentally',c:'顺便'},{w:'occasionally',c:'偶尔'},{w:'frequently',c:'频繁地'},{w:'regularly',c:'定期地'},{w:'constantly',c:'持续地'},
+    {w:'invariably',c:'始终如一'},{w:'inevitably',c:'不可避免地'},{w:'undoubtedly',c:'毫无疑问'},{w:'doubtless',c:'无疑'},{w:'certainly',c:'确实'},
+    {w:'clearly',c:'清楚地'},{w:'obviously',c:'显然'},{w:'evidently',c:'明显地'},{w:'manifestly',c:'显然地'},{w:'patently',c:'显然'},
+    {w:'conceivably',c:'可想象地'},{w:'plausibly',c:'貌似合理地'},{w:'arguably',c:'可以说'},{w:'potentially',c:'潜在地'},{w:'apparently',c:'表面上'},
+    {w:'seemingly',c:'似乎'},{w:'superficially',c:'肤浅地'},{w:'outwardly',c:'外表上'},{w:'internally',c:'内部地'},{w:'externally',c:'外部地'},
+    {w:'collectively',c:'集体地'},{w:'individually',c:'个别地'},{w:'respectively',c:'各自地'},{w:'successively',c:'连续地'},{w:'simultaneously',c:'同时地'}
+  ],
+
+  // ---------- 2. 作者态度与语气词 ----------
+  Tone: [
+    {w:'dismissive',c:'轻蔑的'},{w:'reverent',c:'崇敬的'},{w:'nostalgic',c:'怀旧的'},{w:'cynical',c:'愤世嫉俗的'},{w:'pragmatic',c:'务实的'},
+    {w:'ambivalent',c:'矛盾的'},{w:'fervent',c:'热烈的'},{w:'detached',c:'超然的'},{w:'whimsical',c:'异想天开的'},{w:'sardonic',c:'讽刺的'},
+    {w:'objective',c:'客观的'},{w:'subjective',c:'主观的'},{w:'sympathetic',c:'同情的'},{w:'apathetic',c:'冷漠的'},{w:'ardent',c:'热烈的'},
+    {w:'condescending',c:'屈尊的'},{w:'contemptuous',c:'轻蔑的'},{w:'disapproving',c:'不赞同的'},{w:'approving',c:'赞同的'},{w:'admiring',c:'钦佩的'},
+    {w:'critical',c:'批判的'},{w:'appreciative',c:'欣赏的'},{w:'apprehensive',c:'忧虑的'},{w:'optimistic',c:'乐观的'},{w:'pessimistic',c:'悲观的'},
+    {w:'hopeful',c:'充满希望的'},{w:'desperate',c:'绝望的'},{w:'melancholy',c:'忧郁的'},{w:'somber',c:'阴沉的'},{w:'whimsical',c:'古怪的'},
+    {w:'playful',c:'顽皮的'},{w:'serious',c:'严肃的'},{w:'earnest',c:'认真的'},{w:'sincere',c:'真诚的'},{w:'ironic',c:'反讽的'},
+    {w:'sarcastic',c:'讽刺的'},{w:'wry',c:'歪曲的'},{w:'blunt',c:'直率的'},{w:'forthright',c:'直言的'},{w:'diplomatic',c:'圆通的'},
+    {w:'tactful',c:'得体的'},{w:'discreet',c:'谨慎的'},{w:'candid',c:'坦率的'},{w:'frank',c:'坦白的'},{w:'outspoken',c:'直言不讳的'},
+    {w:'reserved',c:'含蓄的'},{w:'restrained',c:'克制的'},{w:'impassioned',c:'充满激情的'},{w:'vehement',c:'激烈的'},{w:'vindictive',c:'报复性的'},
+    {w:'malicious',c:'恶意的'},{w:'benevolent',c:'仁慈的'},{w:'gracious',c:'亲切的'},{w:'hostile',c:'敌对的'},{w:'antagonistic',c:'敌对的'},
+    {w:'assertive',c:'自信的'},{w:'aggressive',c:'好斗的'},{w:'submissive',c:'顺从的'},{w:'passive',c:'被动的'},{w:'enthusiastic',c:'热情的'},
+    {w:'reluctant',c:'不情愿的'},{w:'hesitant',c:'犹豫的'},{w:'confident',c:'自信的'},{w:'uncertain',c:'不确定的'},{w:'defensive',c:'防御的'},
+    {w:'dignified',c:'庄严的'},{w:'elegant',c:'优雅的'},{w:'grandiose',c:'宏伟的'},{w:'humble',c:'谦逊的'},{w:'proud',c:'自豪的'},
+    {w:'indignant',c:'愤慨的'},{w:'outraged',c:'愤怒的'},{w:'furious',c:'狂怒的'},{w:'livid',c:'暴怒的'},{w:'calm',c:'冷静的'},
+    {w:'composed',c:'镇定的'},{w:'placid',c:'平静的'},{w:'serene',c:'宁静的'},{w:'turbulent',c:'动荡的'},{w:'volatile',c:'易变的'},
+    {w:'stable',c:'稳定的'},{w:'steady',c:'稳定的'},{w:'constant',c:'恒定的'},{w:'erratic',c:'不稳定的'},{w:'unpredictable',c:'不可预测的'}
+  ],
+
+  // ---------- 3. 论证与分析动词 ----------
+  Argument: [
+    {w:'contend',c:'主张'},{w:'assert',c:'断言'},{w:'refute',c:'驳斥'},{w:'corroborate',c:'确证'},{w:'validate',c:'证实'},
+    {w:'postulate',c:'假定'},{w:'presume',c:'推测'},{w:'infer',c:'推断'},{w:'imply',c:'暗示'},{w:'allege',c:'声称'},
+    {w:'concede',c:'承认'},{w:'maintain',c:'坚持'},{w:'proclaim',c:'宣告'},{w:'denounce',c:'谴责'},{w:'advocate',c:'倡导'},
+    {w:'endorse',c:'支持'},{w:'oppose',c:'反对'},{w:'challenge',c:'质疑'},{w:'undermine',c:'削弱'},{w:'reinforce',c:'加强'},
+    {w:'substantiate',c:'证实'},{w:'verify',c:'核实'},{w:'disprove',c:'反驳'},{w:'contradict',c:'相矛盾'},{w:'counter',c:'反驳'},
+    {w:'defend',c:'辩护'},{w:'justify',c:'证明正当'},{w:'rationalize',c:'合理化'},{w:'reconcile',c:'调和'},{w:'synthesize',c:'综合'},
+    {w:'analyze',c:'分析'},{w:'evaluate',c:'评估'},{w:'assess',c:'评估'},{w:'appraise',c:'评价'},{w:'weigh',c:'权衡'},
+    {w:'compare',c:'比较'},{w:'contrast',c:'对比'},{w:'differentiate',c:'区分'},{w:'distinguish',c:'辨别'},{w:'categorize',c:'分类'},
+    {w:'classify',c:'归类'},{w:'identify',c:'识别'},{w:'recognize',c:'认出'},{w:'acknowledge',c:'承认'},{w:'admit',c:'承认'},
+    {w:'question',c:'质疑'},{w:'examine',c:'审视'},{w:'scrutinize',c:'仔细检查'},{w:'interrogate',c:'审问'},{w:'probe',c:'探究'},
+    {w:'explore',c:'探索'},{w:'investigate',c:'调查'},{w:'dissect',c:'剖析'},{w:'break down',c:'分解'},{w:'trace',c:'追溯'},
+    {w:'chart',c:'绘制'},{w:'map',c:'映射'},{w:'demonstrate',c:'证明'},{w:'illustrate',c:'说明'},{w:'exemplify',c:'例证'},
+    {w:'elaborate',c:'详尽说明'},{w:'expand',c:'扩展'},{w:'develop',c:'发展'},{w:'formulate',c:'制定'},{w:'construct',c:'构建'},
+    {w:'establish',c:'建立'},{w:'found',c:'建立'},{w:'constitute',c:'组成'},{w:'compose',c:'构成'},{w:'comprise',c:'包括'},
+    {w:'incorporate',c:'合并'},{w:'integrate',c:'整合'},{w:'assimilate',c:'吸收'},{w:'unify',c:'统一'},{w:'align',c:'对齐'}
+  ],
+
+  // ---------- 4. 文学与叙事手法 ----------
+  Literary: [
+    {w:'protagonist',c:'主角'},{w:'antagonist',c:'反派'},{w:'setting',c:'背景'},{w:'plot',c:'情节'},{w:'climax',c:'高潮'},
+    {w:'resolution',c:'结局'},{w:'symbolism',c:'象征'},{w:'metaphor',c:'暗喻'},{w:'simile',c:'明喻'},{w:'irony',c:'反讽'},
+    {w:'imagery',c:'意象'},{w:'theme',c:'主题'},{w:'motif',c:'母题'},{w:'allegory',c:'寓言'},{w:'allusion',c:'典故'},
+    {w:'foreshadowing',c:'伏笔'},{w:'flashback',c:'倒叙'},{w:'narrative',c:'叙事'},{w:'narrator',c:'叙述者'},{w:'perspective',c:'视角'},
+    {w:'persona',c:'人格面具'},{w:'characterization',c:'人物塑造'},{w:'archetype',c:'原型'},{w:'hero',c:'英雄'},{w:'villain',c:'反派'},
+    {w:'foil',c:'陪衬'},{w:'dialogue',c:'对话'},{w:'monologue',c:'独白'},{w:'soliloquy',c:'自言自语'},{w:'aside',c:'旁白'},
+    {w:'atmosphere',c:'氛围'},{w:'mood',c:'情绪'},{w:'tone',c:'语气'},{w:'style',c:'风格'},{w:'voice',c:'声音'},
+    {w:'epilogue',c:'尾声'},{w:'prologue',c:'序言'},{w:'preface',c:'前言'},{w:'introduction',c:'导言'},{w:'exposition',c:'阐述'},
+    {w:'rising action',c:'上升动作'},{w:'falling action',c:'下降动作'},{w:'conflict',c:'冲突'},{w:'crisis',c:'危机'},{w:'denouement',c:'结局'},
+    {w:'genre',c:'体裁'},{w:'fiction',c:'小说'},{w:'nonfiction',c:'非小说'},{w:'drama',c:'戏剧'},{w:'poetry',c:'诗歌'},
+    {w:'prose',c:'散文'},{w:'essay',c:'散文'},{w:'biography',c:'传记'},{w:'autobiography',c:'自传'},{w:'memoir',c:'回忆录'},
+    {w:'epic',c:'史诗'},{w:'myth',c:'神话'},{w:'legend',c:'传说'},{w:'fable',c:'寓言'},{w:'parable',c:'比喻'},
+    {w:'satire',c:'讽刺'},{w:'parody',c:'戏仿'},{w:'hyperbole',c:'夸张'},{w:'understatement',c:'轻描淡写'},{w:'juxtaposition',c:'并置'},
+    {w:'oxymoron',c:'矛盾修辞'},{w:'paradox',c:'悖论'},{w:'connotation',c:'内涵'},{w:'denotation',c:'外延'},{w:'diction',c:'措辞'},
+    {w:'syntax',c:'句法'},{w:'rhythm',c:'节奏'},{w:'meter',c:'格律'},{w:'rhyme',c:'押韵'},{w:'alliteration',c:'头韵'},
+    {w:'assonance',c:'谐音'},{w:'consonance',c:'尾韵'},{w:'onomatopoeia',c:'拟声'},{w:'colloquialism',c:'口语'},{w:'dialect',c:'方言'},
+    {w:'vernacular',c:'白话'},{w:'eloquence',c:'雄辩'},{w:'rhetoric',c:'修辞'},{w:'pathos',c:'悲情'},{w:'ethos',c:'信誉'},
+    {w:'logos',c:'逻辑'},{w:'catharsis',c:'宣泄'},{w:'tragedy',c:'悲剧'},{w:'comedy',c:'喜剧'},{w:'romance',c:'传奇'},
+    {w:'satirist',c:'讽刺作家'},{w:'novelist',c:'小说家'},{w:'poet',c:'诗人'},{w:'dramatist',c:'剧作家'},{w:'essayist',c:'散文家'}
+  ],
+
+  // ---------- 5. 抽象学术名词 ----------
+  AbstractNouns: [
+    {w:'paradox',c:'悖论'},{w:'nuance',c:'细微差别'},{w:'dichotomy',c:'二分法'},{w:'phenomena',c:'现象'},{w:'consensus',c:'共识'},
+    {w:'ideology',c:'意识形态'},{w:'doctrine',c:'教义'},{w:'ethos',c:'精神气质'},{w:'pathos',c:'悲情'},{w:'logos',c:'逻辑'},
+    {w:'paradigm',c:'范例'},{w:'theory',c:'理论'},{w:'hypothesis',c:'假设'},{w:'framework',c:'框架'},{w:'context',c:'背景'},
+    {w:'perspective',c:'视角'},{w:'interpretation',c:'解读'},{w:'account',c:'描述'},{w:'narrative',c:'叙事'},{w:'discourse',c:'论述'},
+    {w:'dialectic',c:'辩证法'},{w:'analogy',c:'类比'},{w:'anomaly',c:'异常'},{w:'dilemma',c:'困境'},{w:'conundrum',c:'难题'},
+    {w:'enigma',c:'谜'},{w:'equivocation',c:'含糊其辞'},{w:'fallacy',c:'谬误'},{w:'axiom',c:'公理'},{w:'tenet',c:'信条'},
+    {w:'premise',c:'前提'},{w:'assumption',c:'假设'},{w:'implication',c:'含义'},{w:'inference',c:'推论'},{w:'conjecture',c:'推测'},
+    {w:'speculation',c:'投机'},{w:'rumination',c:'沉思'},{w:'contemplation',c:'思考'},{w:'reflection',c:'反思'},{w:'introspection',c:'内省'},
+    {w:'empathy',c:'同理心'},{w:'sympathy',c:'同情'},{w:'compassion',c:'慈悲'},{w:'altruism',c:'利他主义'},{w:'egotism',c:'自大'},
+    {w:'integrity',c:'正直'},{w:'dignity',c:'尊严'},{w:'honor',c:'荣誉'},{w:'virtue',c:'美德'},{w:'vice',c:'罪恶'},
+    {w:'morality',c:'道德'},{w:'ethics',c:'伦理'},{w:'justice',c:'正义'},{w:'equity',c:'公平'},{w:'liberty',c:'自由'},
+    {w:'sovereignty',c:'主权'},{w:'autonomy',c:'自治'},{w:'independence',c:'独立'},{w:'conformity',c:'从众'},{w:'nonconformity',c:'不从众'},
+    {w:'solidarity',c:'团结'},{w:'cohesion',c:'凝聚力'},{w:'coherence',c:'连贯性'},{w:'clarity',c:'清晰'},{w:'ambiguity',c:'模糊性'},
+    {w:'complexity',c:'复杂性'},{w:'simplicity',c:'简单性'},{w:'consistency',c:'一致性'},{w:'contradiction',c:'矛盾'},{w:'complement',c:'补充'},
+    {w:'correlation',c:'相关性'},{w:'causation',c:'因果关系'},{w:'consequence',c:'后果'},{w:'outcome',c:'结果'},{w:'impact',c:'影响'},
+    {w:'effect',c:'效果'},{w:'function',c:'功能'},{w:'structure',c:'结构'},{w:'system',c:'系统'},{w:'process',c:'过程'},
+    {w:'procedure',c:'程序'},{w:'methodology',c:'方法论'},{w:'mechanism',c:'机制'},{w:'dynamics',c:'动态'},{w:'evolution',c:'演变'}
+  ],
+
+  // ---------- 6. 高阶学术动词 ----------
+  AcademicVerbs: [
+    {w:'elucidate',c:'阐明'},{w:'synthesize',c:'综合'},{w:'categorize',c:'分类'},{w:'differentiate',c:'区分'},{w:'evaluate',c:'评价'},
+    {w:'interrogate',c:'质问'},{w:'examine',c:'审视'},{w:'scrutinize',c:'详细检查'},{w:'assess',c:'评估'},{w:'appraise',c:'评价'},
+    {w:'contextualize',c:'语境化'},{w:'extrapolate',c:'外推'},{w:'attribute',c:'归因'},{w:'ascribe',c:'归于'},{w:'rationalize',c:'合理化'},
+    {w:'reconcile',c:'调和'},{w:'bridge',c:'连接'},{w:'frame',c:'构建'},{w:'orient',c:'定位'},{w:'position',c:'定位'},
+    {w:'delineate',c:'描绘'},{w:'demarcate',c:'划界'},{w:'specify',c:'明确'},{w:'stipulate',c:'规定'},{w:'articulate',c:'清晰表达'},
+    {w:'enunciate',c:'清晰发音'},{w:'pronounce',c:'宣称'},{w:'declare',c:'宣布'},{w:'announce',c:'宣告'},{w:'proclaim',c:'声明'},
+    {w:'confer',c:'授予'},{w:'concede',c:'让步'},{w:'concur',c:'同意'},{w:'dissent',c:'不同意'},{w:'acquiesce',c:'默许'},
+    {w:'ascertain',c:'确定'},{w:'discern',c:'辨别'},{w:'perceive',c:'感知'},{w:'conceive',c:'设想'},{w:'devise',c:'设计'},
+    {w:'innovate',c:'创新'},{w:'generate',c:'产生'},{w:'produce',c:'生产'},{w:'manufacture',c:'制造'},{w:'fabricate',c:'编造'},
+    {w:'assemble',c:'组装'},{w:'compile',c:'汇编'},{w:'accumulate',c:'积累'},{w:'amass',c:'积聚'},{w:'garner',c:'收集'},
+    {w:'procure',c:'获得'},{w:'acquire',c:'获得'},{w:'attain',c:'达到'},{w:'achieve',c:'实现'},{w:'execute',c:'执行'},
+    {w:'implement',c:'实施'},{w:'enforce',c:'强制执行'},{w:'impose',c:'强加'},{w:'invoke',c:'援引'},{w:'evoke',c:'引起'},
+    {w:'elicit',c:'引出'},{w:'extract',c:'提取'},{w:'derive',c:'导出'},{w:'deduce',c:'演绎'},{w:'induce',c:'归纳'},
+    {w:'promote',c:'推动'},{w:'facilitate',c:'促进'},{w:'accelerate',c:'加速'},{w:'expedite',c:'加快'},{w:'propel',c:'推动'},
+    {w:'constrain',c:'约束'},{w:'restrain',c:'抑制'},{w:'curtail',c:'削减'},{w:'reduce',c:'减少'},{w:'diminish',c:'减少'}
+  ],
+
+  // ---------- 7. 学术描述词（形容词/副词） ----------
+  Descriptive: [
+    {w:'contemporary',c:'当代的'},{w:'prevalent',c:'普遍的'},{w:'obsolete',c:'过时的'},{w:'nascent',c:'新生的'},{w:'rudimentary',c:'基础的'},
+    {w:'sophisticated',c:'复杂的'},{w:'intricate',c:'精密的'},{w:'robust',c:'健壮的'},{w:'adaptive',c:'适应性的'},{w:'resilient',c:'有韧性的'},
+    {w:'transient',c:'短暂的'},{w:'enduring',c:'持久的'},{w:'permanent',c:'永久的'},{w:'temporary',c:'暂时的'},{w:'interim',c:'临时的'},
+    {w:'inherent',c:'固有的'},{w:'intrinsic',c:'内在的'},{w:'extrinsic',c:'外在的'},{w:'salient',c:'显著的'},{w:'conspicuous',c:'醒目的'},
+    {w:'prominent',c:'突出的'},{w:'distinguished',c:'杰出的'},{w:'eminent',c:'卓越的'},{w:'illustrious',c:'著名的'},{w:'notable',c:'值得注意的'},
+    {w:'profound',c:'深刻的'},{w:'superficial',c:'表面的'},{w:'pervasive',c:'无处不在的'},{w:'ubiquitous',c:'普遍的'},{w:'omnipresent',c:'无所不在的'},
+    {w:'uniform',c:'统一的'},{w:'diverse',c:'多样的'},{w:'heterogeneous',c:'异质的'},{w:'homogeneous',c:'同质的'},{w:'analogous',c:'类似的'},
+    {w:'equivalent',c:'等价的'},{w:'identical',c:'相同的'},{w:'distinct',c:'不同的'},{w:'discrete',c:'分立的'},{w:'continuous',c:'连续的'},
+    {w:'gradual',c:'渐进的'},{w:'sudden',c:'突然的'},{w:'abrupt',c:'意外的'},{w:'steady',c:'稳定的'},{w:'erratic',c:'不稳定的'},
+    {w:'volatile',c:'易变的'},{w:'stable',c:'稳定的'},{w:'dynamic',c:'动态的'},{w:'static',c:'静态的'},{w:'flexible',c:'灵活的'},
+    {w:'rigid',c:'僵硬的'},{w:'pliable',c:'柔韧的'},{w:'ductile',c:'可延展的'},{w:'malleable',c:'可塑造的'},{w:'viable',c:'可行的'},
+    {w:'feasible',c:'可行的'},{w:'practicable',c:'可实现的'},{w:'plausible',c:'貌似合理的'},{w:'credible',c:'可信的'},{w:'incredible',c:'难以置信的'},
+    {w:'legitimate',c:'合法的'},{w:'illegitimate',c:'非法的'},{w:'authentic',c:'真正的'},{w:'genuine',c:'真诚的'},{w:'bogus',c:'假的'},
+    {w:'spurious',c:'伪造的'},{w:'specious',c:'似是而非的'},{w:'fallacious',c:'谬误的'},{w:'tenable',c:'站得住脚的'},{w:'untenable',c:'站不住脚的'},
+    {w:'cogent',c:'有说服力的'},{w:'compelling',c:'令人信服的'},{w:'convincing',c:'有说服力的'},{w:'unconvincing',c:'没有说服力的'},{w:'debatable',c:'有争议的'}
+  ],
+
+  // ---------- 8. 深度阅读分析专用 ----------
+  Analysis: [
+    {w:'contextualize',c:'置于语境'},{w:'extrapolate',c:'推断'},{w:'correlate',c:'关联'},{w:'attribute',c:'归因'},{w:'ascribe',c:'归于'},
+    {w:'rationalize',c:'合理化'},{w:'reconcile',c:'调和'},{w:'bridge',c:'弥合'},{w:'frame',c:'构建框架'},{w:'orient',c:'定向'},
+    {w:'deconstruct',c:'解构'},{w:'reconstruct',c:'重建'},{w:'unpack',c:'拆解'},{w:'parse',c:'解析'},{w:'decode',c:'解码'},
+    {w:'encode',c:'编码'},{w:'translate',c:'转换'},{w:'transcribe',c:'转录'},{w:'paraphrase',c:'转述'},{w:'summarize',c:'总结'},
+    {w:'condense',c:'压缩'},{w:'expand',c:'扩展'},{w:'amplify',c:'放大'},{w:'exemplify',c:'例证'},{w:'instantiate',c:'实例化'},
+    {w:'concretize',c:'具体化'},{w:'abstractize',c:'抽象化'},{w:'generalize',c:'概括'},{w:'particularize',c:'特殊化'},{w:'globalize',c:'全球化'},
+    {w:'localize',c:'本地化'},{w:'centralize',c:'集中'},{w:'decentralize',c:'分散'},{w:'standardize',c:'标准化'},{w:'customize',c:'定制'},
+    {w:'optimize',c:'优化'},{w:'minimize',c:'最小化'},{w:'maximize',c:'最大化'},{w:'prioritize',c:'优先'},{w:'marginalize',c:'边缘化'},
+    {w:'theorize',c:'理论化'},{w:'hypothesize',c:'假设'},{w:'speculate',c:'推测'},{w:'conjecture',c:'猜想'},{w:'postulate',c:'假定'},
+    {w:'suppose',c:'假设'},{w:'presume',c:'推测'},{w:'premise',c:'前提'},{w:'surmise',c:'猜测'},{w:'infer',c:'推断'},
+    {w:'deduce',c:'演绎'},{w:'induce',c:'归纳'},{w:'abduct',c:'推理'},{w:'extrapolate',c:'外推'},{w:'interpolate',c:'内插'},
+    {w:'differentiate',c:'区分'},{w:'discriminate',c:'辨别'},{w:'segregate',c:'分离'},{w:'aggregate',c:'聚合'},{w:'congregate',c:'聚集'},
+    {w:'coalesce',c:'合并'},{w:'converge',c:'汇聚'},{w:'diverge',c:'分歧'},{w:'juxtapose',c:'并列'},{w:'counterpose',c:'对照'},
+    {w:'synthesize',c:'综合'},{w:'integrate',c:'整合'},{w:'assimilate',c:'同化'},{w:'accommodate',c:'适应'},{w:'negotiate',c:'协商'},
+    {w:'mediate',c:'调解'},{w:'arbitrate',c:'仲裁'},{w:'adjudicate',c:'裁决'},{w:'adjudge',c:'宣判'},{w:'decree',c:'颁布法令'},
+    {w:'proclaim',c:'宣布'},{w:'pronounce',c:'宣告'},{w:'articulate',c:'明确表达'},{w:'enunciate',c:'清晰阐述'},{w:'assert',c:'断言'}
+  ]
+};
+
+// ============================================================
+// 2. 关卡主题映射 (40关)
+// ============================================================
+const LEVEL_THEMES = {
+  1:'Logic',2:'Logic',3:'Logic',4:'Logic',5:'Logic',
+  6:'Tone',7:'Tone',8:'Tone',9:'Tone',10:'Tone',
+  11:'Argument',12:'Argument',13:'Argument',14:'Argument',15:'Argument',
+  16:'Literary',17:'Literary',18:'Literary',19:'Literary',20:'Literary',
+  21:'AbstractNouns',22:'AbstractNouns',23:'AbstractNouns',24:'AbstractNouns',25:'AbstractNouns',
+  26:'AcademicVerbs',27:'AcademicVerbs',28:'AcademicVerbs',29:'AcademicVerbs',30:'AcademicVerbs',
+  31:'Descriptive',32:'Descriptive',33:'Descriptive',34:'Descriptive',35:'Descriptive',
+  36:'Analysis',37:'Analysis',38:'Analysis',39:'Analysis',40:'Analysis'
+};
+
+function getLevelWords(level) {
+  const theme = LEVEL_THEMES[level];
+  const pool = WORD_POOLS[theme] || [];
+  const start = ((level - 1) % 5) * 20;
+  return pool.slice(start, start + 20);
+}
+
+// ============================================================
+// 3. 游戏数据管理 (完全复用逻辑)
+// ============================================================
+function defaultData(username) {
+  const levels = {};
+  for (let i = 1; i <= 40; i++) {
+    levels[i] = { unlocked: (i === 1), completed: false, perfect: false, currentStage: 0, lives: 5, score: 0, wrongWords: [] };
+  }
+  return { username, totalScore: 0, totalCorrect: 0, totalWrong: 0, levels, themeStats: {} };
+}
+
+let data = null, currentLevel = 1, answering = false;
+
+function loadData(username) {
+  const raw = localStorage.getItem('readingDeepDive_' + username);
+  if (raw) {
+    try { data = JSON.parse(raw); if (!data.levels || !data.levels[1]) data = defaultData(username); }
+    catch (e) { data = defaultData(username); }
+  } else { data = defaultData(username); }
+  saveData(); return data;
+}
+function saveData() { if (data) localStorage.setItem('readingDeepDive_' + data.username, JSON.stringify(data)); }
+
+function getAllWords() {
+  let all = [];
+  for (const key in WORD_POOLS) all = all.concat(WORD_POOLS[key]);
+  return all;
+}
+
+function getDistractors(correctChinese, excludeWord) {
+  const pool = getAllWords().filter(w => w.c !== correctChinese && w.w !== excludeWord);
+  const shuffled = pool.sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 3).map(w => w.c);
+}
+
+// ============================================================
+// 4. UI 导航 & Toast
+// ============================================================
+function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function backToMenu() { showPage('page-menu'); renderMenu(); }
+function showToast(msg, dur=2000) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.remove('show'), dur); }
+
+// ============================================================
+// 5. 登录
+// ============================================================
+function login() {
+  const name = document.getElementById('login-username').value.trim() || '深度读者';
+  loadData(name);
+  document.getElementById('menu-username').textContent = '👤 ' + data.username;
+  renderMenu();
+  showPage('page-menu');
+  showToast('📖 开启阅读深度之旅，' + data.username + '！');
+}
+
+// ============================================================
+// 6. 渲染主菜单 (40关网格)
+// ============================================================
+function renderMenu() {
+  if (!data) return;
+  document.getElementById('menu-username').textContent = '👤 ' + data.username;
+  document.getElementById('menu-total-score').textContent = data.totalScore;
+  document.getElementById('menu-total-correct').textContent = data.totalCorrect;
+  document.getElementById('menu-total-wrong').textContent = data.totalWrong;
+  let completedCount = 0;
+  for (let i=1; i<=40; i++) if (data.levels[i].completed) completedCount++;
+  document.getElementById('menu-progress').textContent = `${completedCount}/40`;
+
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 40; i++) {
+    const info = data.levels[i];
+    const node = document.createElement('div');
+    node.className = 'level-node';
+    if (!info.unlocked) { node.classList.add('locked'); node.innerHTML = `${i}<span class="badge">🔒</span>`; }
+    else if (info.completed) {
+      node.classList.add('completed');
+      node.innerHTML = `${i}<span class="badge">${info.perfect ? '⭐' : '✅'}</span>`;
+      node.onclick = () => startLevel(i);
+    } else {
+      node.classList.add('unlocked');
+      node.innerHTML = `${i}<span class="badge">▶</span>`;
+      node.onclick = () => startLevel(i);
+    }
+    grid.appendChild(node);
+  }
+}
+
+// ============================================================
+// 7. 游戏核心逻辑
+// ============================================================
+function startLevel(level) {
+  if (!data.levels[level].unlocked) { showToast('该关未解锁！'); return; }
+  currentLevel = level;
+  const info = data.levels[level];
+  if (info.completed) {
+    if (!confirm('已通关，是否重置本关重新挑战？')) return;
+    info.completed = false; info.perfect = false; info.currentStage = 0; info.lives = 5; info.score = 0; info.wrongWords = [];
+    saveData();
+  }
+  if (info.lives <= 0) info.lives = 5;
+  renderGame();
+  showPage('page-game');
+}
+
+function renderGame() {
+  const info = data.levels[currentLevel];
+  const words = getLevelWords(currentLevel);
+  const stage = info.currentStage;
+  document.getElementById('game-level-label').textContent = `第 ${currentLevel} 关`;
+  document.getElementById('game-stage').textContent = Math.min(stage + 1, words.length);
+  document.getElementById('game-score').textContent = info.score;
+
+  const livesDiv = document.getElementById('game-lives-display');
+  livesDiv.innerHTML = '';
+  for (let i=0; i<5; i++) { const s=document.createElement('span'); s.textContent = i < info.lives ? '❤️' : '🖤'; livesDiv.appendChild(s); }
+
+  if (stage >= words.length) { completeLevel(); return; }
+  const wordObj = words[stage];
+  if (!wordObj) { completeLevel(); return; }
+
+  document.getElementById('game-word').textContent = wordObj.w;
+  document.getElementById('game-pos-theme').textContent = `📚 ${LEVEL_THEMES[currentLevel]} · 第 ${stage+1}/20 题`;
+
+  const correct = wordObj.c;
+  const distractors = getDistractors(correct, wordObj.w);
+  const options = [correct, ...distractors].sort(() => Math.random() - 0.5);
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach((btn, idx) => {
+    btn.textContent = options[idx] || '—';
+    btn.className = 'option-btn';
+    btn.disabled = false;
+    btn.dataset.correct = (options[idx] === correct) ? 'true' : 'false';
+  });
+  document.getElementById('game-feedback').textContent = '';
+  document.getElementById('btn-next').style.display = 'none';
+  answering = false;
+}
+
+function selectOption(e) {
+  const btn = e.currentTarget;
+  if (answering || btn.disabled) return;
+  answering = true;
+  const isCorrect = btn.dataset.correct === 'true';
+  const info = data.levels[currentLevel];
+  const words = getLevelWords(currentLevel);
+  const stage = info.currentStage;
+  const wordObj = words[stage];
+
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  if (isCorrect) {
+    btn.classList.add('correct');
+    info.score += 10; data.totalScore += 10; data.totalCorrect += 1;
+    document.getElementById('game-feedback').textContent = '✅ 正确！ +10分';
+    updateThemeStats(LEVEL_THEMES[currentLevel], true);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option-btn').forEach(b => { if (b.dataset.correct === 'true') b.classList.add('correct'); });
+    info.lives -= 1; data.totalWrong += 1;
+    info.wrongWords.push({ word: wordObj.w, chinese: wordObj.c, theme: LEVEL_THEMES[currentLevel] });
+    document.getElementById('game-feedback').textContent = `❌ 错误！ 正确答案: “${wordObj.c}”`;
+    updateThemeStats(LEVEL_THEMES[currentLevel], false);
+  }
+  document.getElementById('game-score').textContent = info.score;
+
+  if (info.lives <= 0) {
+    document.getElementById('game-feedback').textContent += ' 💀 生命耗尽！';
+    document.getElementById('btn-next').style.display = 'none';
+    const p = document.getElementById('game-feedback').parentNode;
+    let retry = p.querySelector('.retry-btn');
+    if (!retry) { retry = document.createElement('button'); retry.className = 'btn btn-danger retry-btn'; retry.textContent = '🔁 重试本关'; retry.onclick = ()=>{ resetLevel(currentLevel); startLevel(currentLevel); }; p.appendChild(retry); }
+    saveData(); return;
+  }
+
+  if (stage + 1 >= words.length) {
+    document.getElementById('btn-next').style.display = 'none';
+    setTimeout(() => completeLevel(), 700);
+  } else {
+    document.getElementById('btn-next').style.display = 'inline-block';
+  }
+  saveData();
+}
+
+function nextQuestion() {
+  const info = data.levels[currentLevel];
+  info.currentStage += 1;
+  saveData();
+  renderGame();
+}
+
+function completeLevel() {
+  const info = data.levels[currentLevel];
+  if (info.completed) return;
+  info.completed = true;
+  info.perfect = (info.lives === 5 && info.wrongWords.length === 0);
+  if (currentLevel < 40) data.levels[currentLevel + 1].unlocked = true;
+  saveData();
+  showToast(`🎉 第 ${currentLevel} 关通关！${info.perfect ? ' ⭐完美！' : ''}`, 2500);
+  document.getElementById('game-feedback').textContent = `🎉 通关！ ${info.perfect ? '⭐完美评价！' : ''}`;
+  document.getElementById('btn-next').style.display = 'none';
+  const p = document.getElementById('game-feedback').parentNode;
+  let backBtn = p.querySelector('.back-btn');
+  if (!backBtn) { backBtn = document.createElement('button'); backBtn.className = 'btn btn-primary back-btn'; backBtn.textContent = '🏠 返回菜单'; backBtn.onclick = backToMenu; p.appendChild(backBtn); }
+  renderMenu();
+}
+
+// ============================================================
+// 8. 主题统计 & 错题本
+// ============================================================
+function updateThemeStats(theme, correct) {
+  if (!data.themeStats[theme]) data.themeStats[theme] = { correct: 0, total: 0 };
+  data.themeStats[theme].total += 1;
+  if (correct) data.themeStats[theme].correct += 1;
+  saveData();
+}
+
+function showThemeStats() {
+  const c = document.getElementById('theme-stats-container');
+  c.innerHTML = '';
+  const stats = data.themeStats;
+  const keys = Object.keys(stats);
+  if (keys.length === 0) { c.innerHTML = '<p class="text-muted">暂无数据</p>'; }
+  else {
+    keys.forEach(k => {
+      const s = stats[k]; const pct = s.total>0 ? Math.round((s.correct/s.total)*100) : 0;
+      const div = document.createElement('div'); div.style.cssText = 'display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;';
+      div.innerHTML = `<span><span class="theme-badge">${k}</span></span><span>${s.correct}/${s.total} (${pct}%)</span>`;
+      c.appendChild(div);
+    });
+  }
+  showPage('page-theme');
+}
+
+function showWrongBook() {
+  const c = document.getElementById('wrong-list-container');
+  c.innerHTML = '';
+  let all = [];
+  for (let i=1; i<=40; i++) {
+    (data.levels[i].wrongWords || []).forEach(w => all.push({...w, level:i}));
+  }
+  if (all.length === 0) { c.innerHTML = '<p class="text-muted">暂无错题，完美！</p>'; }
+  else {
+    all.forEach(w => {
+      const div = document.createElement('div'); div.className = 'wrong-item';
+      div.innerHTML = `<span><strong>${w.word}</strong> — ${w.chinese}</span><span class="theme-badge">Lv.${w.level} · ${w.theme}</span>`;
+      c.appendChild(div);
+    });
+  }
+  showPage('page-wrongbook');
+}
+
+// ============================================================
+// 9. 重置功能
+// ============================================================
+function resetLevel(level) {
+  if (!confirm(`重置第 ${level} 关进度？`)) return;
+  const info = data.levels[level];
+  info.completed = false; info.perfect = false; info.currentStage = 0; info.lives = 5; info.score = 0; info.wrongWords = [];
+  saveData(); renderMenu(); showToast('已重置');
+}
+function resetAll() {
+  if (!confirm('⚠️ 重置全部数据？不可撤销！')) return;
+  const name = data.username;
+  localStorage.removeItem('readingDeepDive_' + name);
+  loadData(name);
+  renderMenu();
+  showToast('已重置全部');
+}
+function exitGame() {
+  if (confirm('退出游戏？进度已保存。')) backToMenu();
+}
+
+// ============================================================
+// 10. 初始化
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.option-btn').forEach(b => b.addEventListener('click', selectOption));
+  document.getElementById('login-username').addEventListener('keypress', (e) => { if (e.key === 'Enter') login(); });
+});
+window.login = login; window.startLevel = startLevel; window.renderMenu = renderMenu; window.backToMenu = backToMenu;
+window.showWrongBook = showWrongBook; window.showThemeStats = showThemeStats; window.resetLevel = resetLevel; window.resetAll = resetAll;
+window.exitGame = exitGame; window.nextQuestion = nextQuestion; window.selectOption = selectOption;
+</script>
+</body>
+</html>
