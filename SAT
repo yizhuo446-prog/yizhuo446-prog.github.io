@@ -1,0 +1,90 @@
+const WORD_POOLS = {
+  // ========== 1. 基础学术逻辑词 (Evidence & Logic) ==========
+  Foundation: [
+    {w:'analyze',c:'分析'},{w:'interpret',c:'解读'},{w:'infer',c:'推断'},{w:'imply',c:'暗示'},{w:'indicate',c:'表明'},
+    {w:'demonstrate',c:'展示'},{w:'illustrate',c:'说明'},{w:'suggest',c:'建议'},{w:'convey',c:'传达'},{w:'reveal',c:'揭示'},
+    {w:'assert',c:'断言'},{w:'claim',c:'声称'},{w:'counter',c:'反驳'},{w:'refute',c:'驳斥'},{w:'support',c:'支持'},
+    {w:'undermine',c:'削弱'},{w:'contradict',c:'矛盾'},{w:'distinguish',c:'区分'},{w:'compare',c:'比较'},{w:'contrast',c:'对比'},
+    {w:'similar',c:'相似的'},{w:'opposing',c:'对立的'},{w:'underlying',c:'潜在的'},{w:'fundamental',c:'根本的'},{w:'valid',c:'有效的'},
+    {w:'credible',c:'可信的'},{w:'subjective',c:'主观的'},{w:'objective',c:'客观的'},{w:'precise',c:'精确的'},{w:'vague',c:'模糊的'},
+    {w:'significant',c:'重要的'},{w:'minor',c:'次要的'},{w:'dominant',c:'主导的'},{w:'prevailing',c:'普遍的'},{w:'emerging',c:'新兴的'},
+    {w:'typical',c:'典型的'},{w:'unique',c:'独特的'},{w:'conventional',c:'常规的'},{w:'radical',c:'激进的'},{w:'moderate',c:'温和的'},
+    {w:'complex',c:'复杂的'},{w:'straightforward',c:'直截了当的'},{w:'abstract',c:'抽象的'},{w:'concrete',c:'具体的'},{w:'explicit',c:'明确的'},
+    {w:'implicit',c:'含蓄的'},{w:'deliberate',c:'故意的'},{w:'intentional',c:'有意图的'},{w:'spontaneous',c:'自发的'},{w:'compelling',c:'令人信服的'},
+    {w:'reasonable',c:'合理的'},{w:'questionable',c:'可疑的'},{w:'controversial',c:'有争议的'},{w:'commonplace',c:'常见的'},{w:'widespread',c:'广泛的'},
+    {w:'prevalent',c:'流行的'},{w:'recurrent',c:'反复出现的'},{w:'timely',c:'及时的'},{w:'previous',c:'先前的'},{w:'subsequent',c:'随后的'},
+    {w:'concurrent',c:'同时发生的'},{w:'consecutive',c:'连续的'},{w:'ultimate',c:'最终的'},{w:'primary',c:'首要的'},{w:'secondary',c:'次要的'},
+    {w:'preliminary',c:'初步的'},{w:'conclusive',c:'决定性的'},{w:'tentative',c:'尝试性的'},{w:'definitive',c:'确定的'},{w:'ambiguous',c:'模棱两可的'},
+    {w:'clear',c:'清晰的'},{w:'apparent',c:'显而易见的'},{w:'obvious',c:'明显的'},{w:'subtle',c:'微妙的'},{w:'perceptible',c:'可感知的'},
+    {w:'discernible',c:'可识别的'},{w:'negligible',c:'微不足道的'},{w:'considerable',c:'相当大的'},{w:'substantial',c:'大量的'},{w:'modest',c:'适度的'},
+    {w:'sharp',c:'急剧的'},{w:'gradual',c:'逐渐的'},{w:'steady',c:'稳定的'},{w:'fluctuating',c:'波动的'},{w:'exponential',c:'指数的'},
+    {w:'linear',c:'线性的'},{w:'cumulative',c:'累积的'},{w:'aggregate',c:'总计的'},{w:'overall',c:'整体的'},{w:'net',c:'净的'}
+  ],
+
+  // ========== 2. 科学实验与数据类 (Science & Data) ==========
+  Science: [
+    {w:'experiment',c:'实验'},{w:'hypothesis',c:'假设'},{w:'theory',c:'理论'},{w:'model',c:'模型'},{w:'variable',c:'变量'},
+    {w:'control',c:'对照'},{w:'sample',c:'样本'},{w:'data',c:'数据'},{w:'statistic',c:'统计数据'},{w:'correlation',c:'相关性'},
+    {w:'causation',c:'因果关系'},{w:'evidence',c:'证据'},{w:'phenomenon',c:'现象'},{w:'mechanism',c:'机制'},{w:'process',c:'过程'},
+    {w:'procedure',c:'程序'},{w:'methodology',c:'方法'},{w:'measurement',c:'测量'},{w:'observation',c:'观察'},{w:'analysis',c:'分析'},
+    {w:'synthesis',c:'综合'},{w:'evaluation',c:'评估'},{w:'comparison',c:'比较'},{w:'classification',c:'分类'},{w:'identification',c:'识别'},
+    {w:'interpretation',c:'解释'},{w:'representation',c:'表示'},{w:'approximation',c:'近似'},{w:'estimation',c:'估计'},{w:'calculation',c:'计算'},
+    {w:'verification',c:'验证'},{w:'replication',c:'重复'},{w:'consistency',c:'一致性'},{w:'accuracy',c:'准确性'},{w:'precision',c:'精密度'},
+    {w:'reliability',c:'可靠性'},{w:'validity',c:'有效性'},{w:'significance',c:'显著性'},{w:'margin',c:'误差'},{w:'deviation',c:'偏差'},
+    {w:'concentration',c:'浓度'},{w:'density',c:'密度'},{w:'volume',c:'体积'},{w:'mass',c:'质量'},{w:'pressure',c:'压力'},
+    {w:'temperature',c:'温度'},{w:'velocity',c:'速度'},{w:'acceleration',c:'加速度'},{w:'frequency',c:'频率'},{w:'amplitude',c:'振幅'},
+    {w:'spectrum',c:'光谱'},{w:'element',c:'元素'},{w:'compound',c:'化合物'},{w:'molecule',c:'分子'},{w:'particle',c:'粒子'},
+    {w:'energy',c:'能量'},{w:'force',c:'力'},{w:'gravity',c:'重力'},{w:'resistance',c:'阻力'},{w:'capacity',c:'容量'},
+    {w:'efficiency',c:'效率'},{w:'output',c:'输出'},{w:'input',c:'输入'},{w:'yield',c:'产量'},{w:'fluctuation',c:'波动'},
+    {w:'trend',c:'趋势'},{w:'pattern',c:'模式'},{w:'cycle',c:'周期'},{w:'phase',c:'阶段'},{w:'transition',c:'过渡'},
+    {w:'exposure',c:'暴露'},{w:'detection',c:'检测'},{w:'sensitivity',c:'灵敏度'},{w:'specificity',c:'特异性'},{w:'threshold',c:'阈值'},
+    {w:'adaptation',c:'适应'},{w:'evolution',c:'进化'},{w:'mutation',c:'变异'},{w:'selection',c:'选择'},{w:'genetic',c:'遗传的'},
+    {w:'cellular',c:'细胞的'},{w:'organic',c:'有机的'},{w:'molecular',c:'分子的'},{w:'biochemical',c:'生物化学的'},{w:'ecological',c:'生态的'},
+    {w:'biological',c:'生物的'},{w:'chemical',c:'化学的'},{w:'physical',c:'物理的'},{w:'mechanical',c:'力学的'},{w:'quantitative',c:'定量的'},
+    {w:'qualitative',c:'定性的'},{w:'empirical',c:'经验的'},{w:'theoretical',c:'理论的'},{w:'computational',c:'计算的'},{w:'experimental',c:'实验的'}
+  ],
+
+  // ========== 3. 历史、文化与社会语境 (History & Society) ==========
+  History: [
+    {w:'context',c:'背景'},{w:'perspective',c:'视角'},{w:'narrative',c:'叙事'},{w:'account',c:'描述'},{w:'interpretation',c:'阐释'},
+    {w:'historian',c:'历史学家'},{w:'archaeology',c:'考古学'},{w:'artifact',c:'手工艺品'},{w:'civilization',c:'文明'},{w:'dynasty',c:'王朝'},
+    {w:'empire',c:'帝国'},{w:'colony',c:'殖民地'},{w:'colonization',c:'殖民'},{w:'independence',c:'独立'},{w:'revolution',c:'革命'},
+    {w:'reform',c:'改革'},{w:'movement',c:'运动'},{w:'protest',c:'抗议'},{w:'resistance',c:'抵抗'},{w:'struggle',c:'斗争'},
+    {w:'justice',c:'正义'},{w:'equality',c:'平等'},{w:'rights',c:'权利'},{w:'liberty',c:'自由'},{w:'democracy',c:'民主'},
+    {w:'republic',c:'共和国'},{w:'governance',c:'治理'},{w:'policy',c:'政策'},{w:'legislation',c:'立法'},{w:'regulate',c:'调节'},
+    {w:'judicial',c:'司法的'},{w:'executive',c:'行政的'},{w:'legislative',c:'立法的'},{w:'constitution',c:'宪法'},{w:'amendment',c:'修正案'},
+    {w:'sovereignty',c:'主权'},{w:'alliance',c:'联盟'},{w:'diplomacy',c:'外交'},{w:'treaty',c:'条约'},{w:'conflict',c:'冲突'},
+    {w:'negotiation',c:'谈判'},{w:'compromise',c:'妥协'},{w:'consensus',c:'共识'},{w:'partisan',c:'党派支持的'},{w:'bipartisan',c:'两党的'},
+    {w:'ideology',c:'意识形态'},{w:'doctrine',c:'学说'},{w:'dogma',c:'教条'},{w:'propaganda',c:'宣传'},{w:'media',c:'媒体'},
+    {w:'public opinion',c:'公众舆论'},{w:'social change',c:'社会变迁'},{w:'urbanization',c:'城市化'},{w:'industrialization',c:'工业化'},{w:'globalization',c:'全球化'},
+    {w:'immigration',c:'移民'},{w:'migration',c:'迁徙'},{w:'refugee',c:'难民'},{w:'assimilation',c:'同化'},{w:'multicultural',c:'多元文化的'},
+    {w:'tradition',c:'传统'},{w:'custom',c:'习俗'},{w:'heritage',c:'遗产'},{w:'cultural',c:'文化的'},{w:'ethnic',c:'种族的'},
+    {w:'gender',c:'性别'},{w:'class',c:'阶级'},{w:'slavery',c:'奴隶制'},{w:'feudalism',c:'封建制度'},{w:'capitalism',c:'资本主义'},
+    {w:'socialism',c:'社会主义'},{w:'welfare',c:'福利'},{w:'tariff',c:'关税'},{w:'commerce',c:'商业'},{w:'economy',c:'经济'},
+    {w:'inflation',c:'通胀'},{w:'recession',c:'衰退'},{w:'depression',c:'萧条'},{w:'productivity',c:'生产力'},{w:'labor',c:'劳动力'},
+    {w:'academic',c:'学术的'},{w:'scholarship',c:'学识'},{w:'intellectual',c:'知识的'},{w:'philosophy',c:'哲学'},{w:'religion',c:'宗教'}
+  ],
+
+  // ========== 4. 高阶学术与抽象推理 (Higher-Level Reasoning) ==========
+  SocialScience: [
+    {w:'concept',c:'概念'},{w:'principle',c:'原则'},{w:'framework',c:'框架'},{w:'paradigm',c:'范例'},{w:'rationale',c:'根本原因'},
+    {w:'justification',c:'正当理由'},{w:'assumption',c:'假设'},{w:'premise',c:'前提'},{w:'implication',c:'含义'},{w:'inference',c:'推论'},
+    {w:'distinction',c:'区别'},{w:'nuance',c:'细微差别'},{w:'intricacy',c:'复杂性'},{w:'ambiguity',c:'模糊性'},{w:'contradiction',c:'矛盾'},
+    {w:'dilemma',c:'困境'},{w:'trade-off',c:'权衡'},{w:'balance',c:'平衡'},{w:'harmony',c:'和谐'},{w:'tension',c:'紧张状态'},
+    {w:'dynamics',c:'动态'},{w:'mechanisms',c:'机制'},{w:'interaction',c:'相互作用'},{w:'relationship',c:'关系'},{w:'correlation',c:'关联'},
+    {w:'connection',c:'联系'},{w:'linkage',c:'连接'},{w:'dependency',c:'依赖'},{w:'autonomy',c:'自主'},{w:'integrity',c:'完整性'},
+    {w:'coherence',c:'连贯性'},{w:'consistency',c:'一致性'},{w:'transparency',c:'透明'},{w:'accountability',c:'问责'},{w:'responsibility',c:'责任'},
+    {w:'competence',c:'能力'},{w:'expertise',c:'专长'},{w:'proficiency',c:'熟练'},{w:'mastery',c:'精通'},{w:'creativity',c:'创造力'},
+    {w:'innovation',c:'创新'},{w:'invention',c:'发明'},{w:'discovery',c:'发现'},{w:'breakthrough',c:'突破'},{w:'advancement',c:'进步'},
+    {w:'evolution',c:'演变'},{w:'transformation',c:'转变'},{w:'reform',c:'改革'},{w:'restoration',c:'恢复'},{w:'preservation',c:'保存'},
+    {w:'conservation',c:'保护'},{w:'degradation',c:'退化'},{w:'deterioration',c:'恶化'},{w:'enhancement',c:'增强'},{w:'optimization',c:'优化'},
+    {w:'expansion',c:'扩展'},{w:'contraction',c:'收缩'},{w:'intensification',c:'强化'},{w:'mitigation',c:'缓解'},{w:'remediation',c:'补救'},
+    {w:'prevention',c:'预防'},{w:'intervention',c:'干预'},{w:'mediation',c:'调解'},{w:'arbitration',c:'仲裁'},{w:'litigation',c:'诉讼'},
+    {w:'testimony',c:'证词'},{w:'evidence',c:'证据'},{w:'proof',c:'证明'},{w:'certification',c:'认证'},{w:'validation',c:'证实'},
+    {w:'verification',c:'核实'},{w:'falsification',c:'证伪'},{w:'objectivity',c:'客观'},{w:'subjectivity',c:'主观'},{w:'bias',c:'偏见'},
+    {w:'stereotype',c:'刻板印象'},{w:'discrimination',c:'歧视'},{w:'prejudice',c:'偏见'},{w:'stigma',c:'污名'},{w:'empathy',c:'同理心'},
+    {w:'sympathy',c:'同情'},{w:'compassion',c:'同情心'},{w:'altruism',c:'利他主义'},{w:'egoism',c:'利己主义'},{w:'ethics',c:'伦理学'},
+    {w:'morality',c:'道德'},{w:'virtue',c:'美德'},{w:'vice',c:'恶习'},{w:'logical',c:'逻辑的'},{w:'illogical',c:'不合逻辑的'},
+    {w:'plausible',c:'似是而非的'},{w:'implausible',c:'难以置信的'},{w:'unprecedented',c:'前所未有的'},{w:'inevitable',c:'不可避免的'},{w:'exempt',c:'免除的'}
+  ]
+};
